@@ -1,7 +1,7 @@
 const line = require('@line/bot-sdk');
 const config = {
-    channelAccessToken: process.env.ACCESS_TOKEN,
-    channelSecret: process.env.CHANNEL_SECRET
+    channelAccessToken: process.env.ACCESS_TOKEN_DEV,
+    channelSecret: process.env.CHANNEL_SECRET_DEV
   };
 const BotFacade = require('./bot-facade.js');
 const client = new line.Client(config);
@@ -31,7 +31,7 @@ module.exports = function (context, req) {
                 return context.done();
             });
     }
-    
+
     function handleEvent(event) {
         const saveDoc = log.saveDocument({
             "id": event.message.id,
@@ -50,7 +50,7 @@ module.exports = function (context, req) {
                 //TODO 動画保存
                 return saveDoc;
             }
-        } 
+        }
         return saveDoc;
     }
 };

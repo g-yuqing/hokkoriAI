@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "MOVIE_STORAGE_KEY": "",
+    "ACCESS_TOKEN": "",
+    "CHANNEL_SECRET": "",
+    "IS_DEBUG": true,
+    "CosmosDbEndpoint": "",
+    "CosmosDbKey": ""
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "line-movie-reaction-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kheiakiyama/line-movie-reaction-bot.git"
+  },
+  "author": "kheiakiyama",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kheiakiyama/line-movie-reaction-bot/issues"
+  },
+  "homepage": "https://github.com/kheiakiyama/line-movie-reaction-bot#readme",
+  "dependencies": {
+    "@line/bot-sdk": "^6.1.0",
+    "documentdb": "^1.14.4"
+  }
+}

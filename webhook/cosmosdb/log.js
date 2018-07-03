@@ -5,9 +5,7 @@ const documentClient = require('documentdb').DocumentClient,
 export default class CosmosDbLog {
   constructor() {
     this._client = new documentClient(config.endpoint, {'masterKey': config.cosmosDbKey})
-    this._HttpStatusCodes = {
-      NOTFOUND: 404
-    }
+    this._HttpStatusCodes = {NOTFOUND: 404}
     this._databaseUrl = `dbs/${config.database.id}`
     this._collectionUrl = `${this._databaseUrl}/colls/${config.collection.id}`
   }
@@ -16,9 +14,10 @@ export default class CosmosDbLog {
     console.log(`Getting database:\n${config.database.id}\n`)
     return new Promise((resolve, reject) => {
       this._client.readDatabase(this._databaseUrl, (err, result) => {
-        if (err) {
+        if(err) {
           reject(err)
-        } else {
+        }
+        else {
           resolve(result)
         }
       })
@@ -38,3 +37,4 @@ export default class CosmosDbLog {
     })
   }
 }
+//https://docs.microsoft.com/en-us/azure/cosmos-db/sql-api-nodejs-get-started

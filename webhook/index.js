@@ -9,14 +9,10 @@ const config = {
   channelSecret: process.env.CHANNEL_SECRET
 }
 const client = new line.Client(config)
-const log = new CosmosDbLog()
-log.getDatabase()
-  .then(() => {
-    console.log('CosmosDb connected successfully')
-  })
-  .catch(error => {
-    console.log(`CosmosDb connected with error ${JSON.stringify(error)}`)
-  })
+const dbLog = new CosmosDbLog()
+dbLog.getDatabase()
+  .then(() => {console.log('CosmosDb connected successfully')})
+  .catch(error => {console.log(`CosmosDb connected with error ${JSON.stringify(error)}`)})
 module.exports = function(context, req) {
   // const facade = new BotFacade(client, context, process.env.IS_DEBUG)
   const textRes = new TextResponse(client, context, process.env.IS_DEBUG)
@@ -39,23 +35,30 @@ module.exports = function(context, req) {
   }
 
   function handleEvent(event) {
-    const saveDoc = log.saveDocument({'id': event.message.id, 'body': event}).then(() => {
-      console.log('CosmosDb saved successfully')
-    }).catch((error) => {
-      console.log(`CosmosDb saved with error ${JSON.stringify(error)}`)
-    })
     if (event.type === 'message') {
       if (event.message.type === 'text') {
+        // save
+        const saveDoc = dbLog.saveDocument({'id': event.message.id, 'body': event})
+          .then(() => {
+            console.log('CosmosDb saved successfully')
+          })
+          .catch((error) => {
+            console.log(`CosmosDb saved with error ${JSON.stringify(error)}`)
+          })
+        // process
         const reply = textRes.replyMessage(event.replyToken, {
           type: 'text',
           text: event.message.text
         })
         return Promise.all([saveDoc, reply])
-      } else if (event.message.type === 'video') {
+      }
+      else if(event.message.type === 'audio') {
         //TODO 動画保存
-        return saveDoc
+        // return saveDoc
       }
     }
-    return saveDoc
+    else {
+      return Promise.resolve(null)
+    }
   }
 }

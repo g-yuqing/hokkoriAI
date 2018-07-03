@@ -19,7 +19,10 @@
   "dependencies": {
     "@line/bot-sdk": "^6.1.0",
     "axios": "^0.18.0",
-    "documentdb": "^1.14.4"
+    "azure-storage": "^2.10.0",
+    "documentdb": "^1.14.4",
+    "dotenv": "^6.0.0",
+    "yargs": "^12.0.1"
   },
   "devDependencies": {
     "eslint": "^5.0.1"

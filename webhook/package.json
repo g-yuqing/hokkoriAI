@@ -18,6 +18,10 @@
   "homepage": "https://github.com/kheiakiyama/line-movie-reaction-bot#readme",
   "dependencies": {
     "@line/bot-sdk": "^6.1.0",
+    "axios": "^0.18.0",
     "documentdb": "^1.14.4"
+  },
+  "devDependencies": {
+    "eslint": "^5.0.1"
   }
 }

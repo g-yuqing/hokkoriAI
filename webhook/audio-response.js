@@ -18,8 +18,8 @@ module.exports = class AudioResponse {
       this.client.getMessageContent(message.id)
         .then(stream => {
           this.context.log('content of stream')
-          this.context.log(stream)
-          axios.post(url, stream, config)
+          const data = {audio: stream}
+          axios.post(url, data, config)
             .then(res => {
               this.context.log(res)
             })

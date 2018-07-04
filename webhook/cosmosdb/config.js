@@ -16,7 +16,7 @@
 // // ADD THIS PART TO YOUR CODE
 // module.exports = config
 
-export default {
+const config = {
   endpoint: process.env.CosmosDbEndpoint,
   cosmosDbKey: process.env.CosmosDbKey,
   database: {
@@ -26,3 +26,4 @@ export default {
     'id': 'chatlog'
   }
 }
+module.exports = config

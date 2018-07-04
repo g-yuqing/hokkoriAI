@@ -1,6 +1,6 @@
-import axios from 'axios'
+const axios = require('axios')
 
-export default class TextResponse {
+module.exports = class TextResponse {
   constructor(lineClient, context, isDebug) {
     this.client = lineClient
     this.context = context

@@ -1,6 +1,6 @@
 const line = require('@line/bot-sdk')
-import CosmosDbLog from './cosmosdb/log'
-import TextResponse from './text-response'
+const CosmosDbLog = require('./cosmosdb/log')
+const TextResponse = require('./text-response')
 
 
 const config = {

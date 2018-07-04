@@ -2,7 +2,7 @@
 const documentClient = require('documentdb').DocumentClient,
   config = require('./config')
 
-export default class CosmosDbLog {
+module.exports = class CosmosDbLog {
   constructor() {
     this._client = new documentClient(config.endpoint, {'masterKey': config.cosmosDbKey})
     this._HttpStatusCodes = {NOTFOUND: 404}

@@ -1,4 +1,5 @@
 const axios = require('axios')
+const FormData = require('form-data')
 
 module.exports = class AudioResponse {
   constructor(lineClient, context, isDebug) {
@@ -20,7 +21,9 @@ module.exports = class AudioResponse {
         .then(stream => {
           this.context.log('content of stream')
           this.context.log()
-          axios.post(url, stream, config)
+          const data = new FormData()
+          data.append('audio', stream)
+          axios.post(url, data, config)
             .then(res => {
               this.context.log(res)
             })

@@ -33,8 +33,12 @@ module.exports = class TextResponse {
         }
       axios.post(url, data, config)
         .then(res => {
-          this.context.log('axios: successful.')
           this.context.log(res.data)
+          const reply = {
+            type: 'text',
+            text: res.data.answers[0].answer
+          }
+          return this.client.replyMessage(replyToken, reply)
         })
         .catch(err => {this.context.log(`axios post error: ${err}`)})
     }

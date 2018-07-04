@@ -23,7 +23,7 @@ module.exports = class AudioResponse {
           this.context.log('content of stream')
           let data = new FormData()
           data.append('audio', stream)
-          data.append('image', fs.createReadStream('./test.png'), 'test.png')
+          this.context.log(`image data: ${fs.createReadStream('./test.png')}`)
           this.context.log(data)
           axios.post(url, data, config)
             .then(res => {

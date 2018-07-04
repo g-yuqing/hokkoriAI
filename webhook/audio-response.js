@@ -13,7 +13,7 @@ module.exports = class AudioResponse {
       this.client.getMessageContent(message.id)
         .then(stream => {
           this.context.log('content of stream')
-          axios.post(url, stream)
+          axios.post(url, {'text': '123'})
             .then(res => {
               this.context.log(res)
             })

@@ -12,12 +12,14 @@ module.exports = class AudioResponse {
       const url = 'https://yuqingguan.top/audio',
         config = {
           headers: {
-            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/json'
+            'Content-Type': 'multipart/form-data'
           },
         }
       this.client.getMessageContent(message.id)
         .then(stream => {
           this.context.log('content of stream')
+          this.context.log()
           axios.post(url, stream, config)
             .then(res => {
               this.context.log(res)

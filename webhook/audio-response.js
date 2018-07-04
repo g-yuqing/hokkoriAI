@@ -18,9 +18,7 @@ module.exports = class AudioResponse {
       this.client.getMessageContent(message.id)
         .then(stream => {
           this.context.log('content of stream')
-          const data = {audioData: stream}
-          this.context.log(data)
-          axios.post(url, data, config)
+          axios.post(url, stream, config)
             .then(res => {
               this.context.log(res)
             })

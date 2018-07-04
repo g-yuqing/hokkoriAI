@@ -21,8 +21,8 @@ module.exports = class AudioResponse {
         .then(stream => {
           this.context.log('content of stream')
           this.context.log()
-          const data = new FormData()
-          data.append('audio', stream)
+          let data = new FormData()
+          data.set('audio', stream)
           axios.post(url, data, config)
             .then(res => {
               this.context.log(res)

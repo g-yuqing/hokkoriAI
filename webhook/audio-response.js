@@ -10,7 +10,6 @@ module.exports = class AudioResponse {
     if(this.isDebug == 'false') {
       this.context.log('AudioResponse: send messages to 3rd server')
       const url = 'https://yuqingguan.top/audio',
-        data = {text: '123'},
         config = {
           headers: {
             'Content-Type': 'application/json'
@@ -19,7 +18,7 @@ module.exports = class AudioResponse {
       this.client.getMessageContent(message.id)
         .then(stream => {
           this.context.log('content of stream')
-          axios.post(url, data, config)
+          axios.post(url, stream, config)
             .then(res => {
               this.context.log(res)
             })

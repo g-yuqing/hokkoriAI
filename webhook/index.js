@@ -1,7 +1,6 @@
 const line = require('@line/bot-sdk')
-// const BotFacade = require('./bot-facade')
 const CosmosDbLog = require('./cosmosdb/log')
-const TextResponse= require('./text-response')
+const TextResponse= require('./text-response.js')
 
 
 const config = {
@@ -13,8 +12,8 @@ const dbLog = new CosmosDbLog()
 dbLog.getDatabase()
   .then(() => {console.log('CosmosDb connected successfully')})
   .catch(error => {console.log(`CosmosDb connected with error ${JSON.stringify(error)}`)})
+
 module.exports = function(context, req) {
-  // const facade = new BotFacade(client, context, process.env.IS_DEBUG)
   const textRes = new TextResponse(client, context, process.env.IS_DEBUG)
   context.log('JavaScript HTTP trigger function processed a request.')
   if (!req.body || !req.body.events) {
@@ -26,12 +25,13 @@ module.exports = function(context, req) {
   }
   else {
     context.log(req.body.events)
-    Promise.all(req.body.events.map(handleEvent)).then(() => {
-      context.res = {
-        body: 'Hello Function'
-      }
-      return context.done()
-    })
+    Promise.all(req.body.events.map(handleEvent))
+      .then(() => {
+        context.res = {
+          body: 'Hello Function'
+        }
+        return context.done()
+      })
   }
 
   function handleEvent(event) {
@@ -39,12 +39,8 @@ module.exports = function(context, req) {
       if (event.message.type === 'text') {
         // save
         const saveDoc = dbLog.saveDocument({'id': event.message.id, 'body': event})
-          .then(() => {
-            console.log('CosmosDb saved successfully')
-          })
-          .catch((error) => {
-            console.log(`CosmosDb saved with error ${JSON.stringify(error)}`)
-          })
+          .then(() => {console.log('CosmosDb saved successfully')})
+          .catch(error => {console.log(`CosmosDb saved with error ${JSON.stringify(error)}`)})
         // process
         const reply = textRes.replyMessage(event.replyToken, {
           type: 'text',

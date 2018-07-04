@@ -1,5 +1,5 @@
 const line = require('@line/bot-sdk')
-const CosmosDbLog = require('./cosmosdb/log')
+const CosmosDbLog = require('./cosmosdb/log.js')
 const TextResponse= require('./text-response.js')
 
 

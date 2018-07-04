@@ -24,6 +24,7 @@ module.exports = class AudioResponse {
               this.context.log(res)
             })
         })
+        .catch(err => {this.context.log(`axios post error: ${err}`)})
     }
     else {
       return Promise.resolve(null)

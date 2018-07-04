@@ -6,11 +6,9 @@ module.exports = class TextResponse {
     this.context = context
     this.isDebug = isDebug
   }
-  replyMessage(replyToken, messages) {
+  replyMessage(replyToken, message) {
     if(this.isDebug == 'false') {
-      this.context.log(`replyToken: ${replyToken}`)
-      this.context.log(messages)
-      this.context.log('send messages to 3rd server')
+      this.context.log('TextResponse: send messages to QnA Maker Service')
       // // request to thrid server
       // const url = `https://yuqingguan.top/text/${messages.text}`
       // axios.get(url)
@@ -24,7 +22,7 @@ module.exports = class TextResponse {
       //   })
       // request to Auzre QnA Maker
       const url = 'https://hokkoriai-qna.azurewebsites.net/qnamaker/knowledgebases/7a05a644-aacc-4177-b3af-73f3d249fe8f/generateAnswer',
-        data = {question: messages.text},
+        data = {question: message.text},
         config = {
           headers: {
             'Content-Type': 'application/json',

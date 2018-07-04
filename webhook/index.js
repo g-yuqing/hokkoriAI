@@ -1,6 +1,7 @@
 const line = require('@line/bot-sdk')
 const CosmosDbLog = require('./cosmosdb/log')
 const TextResponse = require('./text-response')
+const AudioResponse = require('./audio-response')
 
 
 const config = {
@@ -15,6 +16,7 @@ dbLog.getDatabase()
 
 module.exports = function(context, req) {
   const textRes = new TextResponse(client, context, process.env.IS_DEBUG)
+  const audioRes = new AudioResponse(client, context, process.env.IS_DEBUG)
   context.log('JavaScript HTTP trigger function processed a request.')
   if (!req.body || !req.body.events) {
     context.res = {
@@ -37,20 +39,21 @@ module.exports = function(context, req) {
   function handleEvent(event) {
     if (event.type === 'message') {
       if (event.message.type === 'text') {
-        // save
-        const saveDoc = dbLog.saveDocument({'id': event.message.id, 'body': event})
-          .then(() => {console.log('CosmosDb saved successfully')})
-          .catch(error => {console.log(`CosmosDb saved with error ${JSON.stringify(error)}`)})
         // process
         const reply = textRes.replyMessage(event.replyToken, {
           type: 'text',
           text: event.message.text
         })
+        // save text to cosmosdb
+        const saveDoc = dbLog.saveDocument({'id': event.message.id, 'body': event})
+          .then(() => {console.log('CosmosDb saved successfully')})
+          .catch(error => {console.log(`CosmosDb saved with error ${JSON.stringify(error)}`)})
         return Promise.all([saveDoc, reply])
       }
       else if(event.message.type === 'audio') {
-        //TODO 動画保存
-        // return saveDoc
+        // process
+        const reply = audioRes.replyMessage(event.replyToken, event.message)
+        //TODO save audio to blob storage
       }
     }
     else {

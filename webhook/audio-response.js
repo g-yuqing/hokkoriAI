@@ -1,5 +1,6 @@
 const axios = require('axios')
 const FormData = require('form-data')
+const fs = require('fs')
 
 module.exports = class AudioResponse {
   constructor(lineClient, context, isDebug) {
@@ -22,6 +23,7 @@ module.exports = class AudioResponse {
           this.context.log('content of stream')
           let data = new FormData()
           data.append('audio', stream)
+          data.append('image', fs.createReadStream('./test.png'), 'test.png')
           this.context.log(data)
           axios.post(url, data, config)
             .then(res => {

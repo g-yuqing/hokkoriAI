@@ -9,18 +9,11 @@ module.exports = class AudioResponse {
   replyMessage(replyToken, message) {
     if(this.isDebug == 'false') {
       this.context.log('AudioResponse: send messages to 3rd server')
-      const url = 'https://yuqingguan.top/audio/',
-        data = {question: message.text},
-        config = {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'EndpointKey 0c088b78-4811-4565-b452-d121ae9075b1'
-          },
-        }
+      const url = 'https://yuqingguan.top/audio/'
       this.client.getMessageContent(message.id)
         .then(stream => {
           this.context.log('content of stream')
-          axios.post(url, stream, config)
+          axios.post(url, stream)
             .then(res => {
               this.context.log(res)
             })

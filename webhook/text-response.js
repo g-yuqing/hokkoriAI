@@ -13,11 +13,13 @@ module.exports = class TextResponse {
       this.context.log('send messages to 3rd server')
       // request to thrid server
       const url = `https://yuqingguan.top/text/${messages.text}`
-      this.context.log(`3rd server url: ${url}`)
       axios.get(url)
         .then(res => {
-          const reply = res.data
-          this.context.log(`response from 3rd server: ${reply}`)
+          const replyText = res.data
+          const reply = {
+            type: 'text',
+            text: replyText
+          }
           return this.client.replyMessage(replyToken, reply)
         })
       // return this.client.replyMessage(replyToken, messages)

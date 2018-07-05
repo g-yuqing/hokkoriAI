@@ -11,24 +11,6 @@ module.exports = class AudioResponse {
   }
   replyMessage(replyToken, message) {
     if(this.isDebug == 'false') {
-      // const downloadPath = path.join(__dirname, 'downloaded', `${message.id}.m4a`)
-      // return this.downloadAudio(message.id, downloadPath)
-      //   .then((downloadPath) => {
-      //     const getDuration = require('get-audio-duration')
-      //     let audioDuration
-      //     getDuration(downloadPath)
-      //       .then((duration) => { audioDuration = duration })
-      //       .catch(error => { audioDuration = 1 })
-      //       .finally(() => {
-      //         return this.client.replyMessage(
-      //           replyToken,
-      //           {
-      //             type: 'audio',
-      //             originalContentUrl: '/downloaded/' + path.basename(downloadPath),
-      //             duration: audioDuration * 1000,
-      //           })
-      //       })
-      //   })
       const url = 'https://yuqingguan.top/audio',
         config = {
           headers: {
@@ -36,32 +18,41 @@ module.exports = class AudioResponse {
           },
         },
         downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a')
-      this.downloadAudio(message.id, downloadPath)
-        .then(() => {
-          this.context.log('AudioResponse: send messages to 3rd server')
+      this.client.getMessageContent(message.id)
+        .then(stream => {
           const data = new FormData()
-          // data.append('audio', fs.createReadStream(downloadPath))
-          data.append('audio', fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a')))
-          this.context.log(data)
+          data.append('audio', stream)
           axios.post(url, data, config)
             .then(res => {
               this.context.log(res)
-              this.context.log('reply audio response')
-              const getDuration = require('get-audio-duration')
-              let audioDuration
-              getDuration(downloadPath)
-                .then(duration => {audioDuration = duration})
-                .catch(() => {audioDuration = 1})
-                .finally(() => {
-                  return this.client.replyMessage(replyToken, {
-                    type: 'audio',
-                    originalContentUrl: `${process.env.BASE_URL}/tempfile/${path.basename(downloadPath)}`,
-                    duration: audioDuration*1000
-                  })
-                })
             })
         })
-        .catch(err => {this.context.log(`axios post error: ${err}`)})
+      // this.downloadAudio(message.id, downloadPath)
+      //   .then(() => {
+      //     this.context.log('AudioResponse: send messages to 3rd server')
+      //     const data = new FormData()
+      //     // data.append('audio', fs.createReadStream(downloadPath))
+      //     data.append('audio', fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a')))
+      //     this.context.log(data)
+      //     axios.post(url, data, config)
+      //       .then(res => {
+      //         this.context.log(res)
+      //         this.context.log('reply audio response')
+      //         const getDuration = require('get-audio-duration')
+      //         let audioDuration
+      //         getDuration(downloadPath)
+      //           .then(duration => {audioDuration = duration})
+      //           .catch(() => {audioDuration = 1})
+      //           .finally(() => {
+      //             return this.client.replyMessage(replyToken, {
+      //               type: 'audio',
+      //               originalContentUrl: `${process.env.BASE_URL}/tempfile/${path.basename(downloadPath)}`,
+      //               duration: audioDuration*1000
+      //             })
+      //           })
+      //       })
+      //   })
+      //   .catch(err => {this.context.log(`axios post error: ${err}`)})
     }
     else {
       return Promise.resolve(null)

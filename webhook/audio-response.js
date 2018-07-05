@@ -25,6 +25,7 @@ module.exports = class AudioResponse {
           stream.on('data', chunck => {
             data.append(`buffer${chunckCount}`, chunck)
             chunckCount += 1
+            this.context.log(`in: ${chunckCount}`)
             // this.context.log(typeof(chunck))
             // this.context.log(chunck)
           })

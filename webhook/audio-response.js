@@ -11,7 +11,6 @@ module.exports = class AudioResponse {
   }
   replyMessage(replyToken, message) {
     if(this.isDebug == 'false') {
-      this.context.log('AudioResponse: send messages to 3rd server')
       const url = 'https://yuqingguan.top/audio',
         config = {
           headers: {
@@ -21,9 +20,16 @@ module.exports = class AudioResponse {
         downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a')
       this.downloadAudio(message.id, downloadPath)
         .then(() => {
-          this.context.log('audio saved')
-          return 'ok'
+          this.context.log('AudioResponse: send messages to 3rd server')
+          const data = new FormData()
+          data.append('audio', fs.createReadStream(downloadPath))
+          this.context.log(data)
+          axios.post(url, data, config)
+            .then(res => {
+              this.contex.log(res)
+            })
         })
+        .catch(err => {this.context.log(`axios post error: ${err}`)})
       // this.client.getMessageContent(message.id)
       //   .then(stream => {
       //     this.context.log('content of stream')

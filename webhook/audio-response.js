@@ -18,33 +18,18 @@ module.exports = class AudioResponse {
             'Content-Type': 'multipart/form-data'
           },
         }
-      let data = new FormData()
-      let chunckCount = 0
       this.client.getMessageContent(message.id)
         .then(stream => {
-          stream.on('data', chunck => {
-            data.append(`buffer${chunckCount}`, chunck)
-            chunckCount += 1
-            this.context.log(`in: ${chunckCount}`)
-          })
-          stream.on('error', err => {
-            this.context.log(err)
-          })
+          this.context.log('content of stream')
+          let data = new FormData()
+          data.append('audio', stream)
+          this.context.log(stream)
+          axios.post(url, data, config)
+            .then(res => {
+              this.context.log(res)
+            })
         })
-        .then(() => {
-          this.context.log(chunckCount)
-          this.context.log(data)
-        })
-        // .then(stream => {
-        //   this.context.log('content of stream')
-        //   let data = new FormData()
-        //   data.append('audio', stream)
-        //   axios.post(url, data, config)
-        //     .then(res => {
-        //       this.context.log(res)
-        //     })
-        // })
-        // .catch(err => {this.context.log(`axios post error: ${err}`)})
+        .catch(err => {this.context.log(`axios post error: ${err}`)})
     }
     else {
       return Promise.resolve(null)

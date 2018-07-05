@@ -1,6 +1,7 @@
 const axios = require('axios')
 const FormData = require('form-data')
 const fs = require('fs')
+const path = require('path')
 
 module.exports = class AudioResponse {
   constructor(lineClient, context, isDebug) {
@@ -14,14 +15,14 @@ module.exports = class AudioResponse {
       const url = 'https://yuqingguan.top/audio',
         config = {
           headers: {
-            // 'Content-Type': 'application/json'
             'Content-Type': 'multipart/form-data'
           },
         },
-        downloadPath = './tempfile/audio.m4a'
+        downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a')
       this.downloadAudio(message.id, downloadPath)
         .then(() => {
           this.context.log('audio saved')
+          return 'ok'
         })
       // this.client.getMessageContent(message.id)
       //   .then(stream => {

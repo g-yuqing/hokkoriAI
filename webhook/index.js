@@ -52,6 +52,7 @@ module.exports = function(context, req) {
       }
       else if(event.message.type === 'audio') {
         // process
+        context.log('start audio processing')
         const reply = audioRes.replyMessage(event.replyToken, event.message)
         //TODO save audio to blob storage
       }

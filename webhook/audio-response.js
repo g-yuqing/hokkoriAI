@@ -17,22 +17,33 @@ module.exports = class AudioResponse {
             // 'Content-Type': 'application/json'
             'Content-Type': 'multipart/form-data'
           },
-        }
-      this.client.getMessageContent(message.id)
-        .then(stream => {
-          this.context.log('content of stream')
-          let data = new FormData()
-          data.append('audio', stream)
-          this.context.log(data)
-          axios.post(url, data, config)
-            .then(res => {
-              this.context.log(res)
-            })
-        })
-        .catch(err => {this.context.log(`axios post error: ${err}`)})
+        },
+        downloadPath = './tempfile/audio.m4a'
+      this.downloadAudio(message.id, downloadPath)
+      // this.client.getMessageContent(message.id)
+      //   .then(stream => {
+      //     this.context.log('content of stream')
+      //     let data = new FormData()
+      //     data.append('audio', stream)
+      //     this.context.log(data)
+      //     axios.post(url, data, config)
+      //       .then(res => {
+      //         this.context.log(res)
+      //       })
+      //   })
+      //   .catch(err => {this.context.log(`axios post error: ${err}`)})
     }
     else {
       return Promise.resolve(null)
     }
+  }
+  downloadAudio(messageId, downloadPath) {
+    return this.client.getMessageContent(messageId)
+      .then(stream => new Promise((resolve, reject) => {
+        const writable = fs.createWriteStream(downloadPath)
+        stream.pipe(writable)
+        stream.on('end', () => resolve(downloadPath))
+        stream.on('error', reject)
+      }))
   }
 }

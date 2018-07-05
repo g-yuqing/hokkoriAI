@@ -17,7 +17,7 @@ module.exports = class AudioResponse {
             'Content-Type': 'multipart/form-data'
           },
         },
-        downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a')
+        downloadPath = path.join(__dirname, 'tempfile', 'audio.wav')
       this.downloadAudio(message.id, downloadPath)
         .then(() => {
           this.context.log('AudioResponse: send messages to 3rd server')

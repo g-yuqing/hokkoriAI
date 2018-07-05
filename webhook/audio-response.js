@@ -30,11 +30,13 @@ module.exports = class AudioResponse {
       const readable = fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a'))
       this.context.log(readable)
       const data = new FormData()
-      data.append('audio', readable)
-      axios.post(url, data, {headers: data.getHeaders(),})
-        .then(res => {
-          this.context.log(res)
-        })
+      readable.on('data', chunk => {
+        data.append('audio', chunk)
+        axios.post(url, data, {headers: data.getHeaders(),})
+          .then(res => {
+            this.context.log(res)
+          })
+      })
       // this.downloadAudio(message.id, downloadPath)
       //   .then(() => {
       //     this.context.log('AudioResponse: send messages to 3rd server')

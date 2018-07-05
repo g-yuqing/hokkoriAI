@@ -20,6 +20,9 @@ module.exports = class AudioResponse {
         },
         downloadPath = './tempfile/audio.m4a'
       this.downloadAudio(message.id, downloadPath)
+        .then(() => {
+          this.context.log('audio saved')
+        })
       // this.client.getMessageContent(message.id)
       //   .then(stream => {
       //     this.context.log('content of stream')

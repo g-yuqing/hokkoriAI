@@ -12,11 +12,6 @@ module.exports = class AudioResponse {
   replyMessage(replyToken, message) {
     if(this.isDebug == 'false') {
       const url = 'https://yuqingguan.top/audio',
-        // config = {
-        //   headers: {
-        //     'Content-Type': 'multipart/form-data'
-        //   },
-        // },
         downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a')
       this.downloadAudio(message.id, downloadPath)
         .then(() => {
@@ -24,36 +19,18 @@ module.exports = class AudioResponse {
           const data = new FormData()
           data.append('file', fs.createReadStream(downloadPath))
           // data.append('audio', fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a')))
-          request.post({
+          const options = {
             url: url,
+            method: 'POST',
             headers: data.getHeaders(),
             formData: data
-          }, (err, res, body) => {
-            if(err) {
-              this.context.log('upload failed', err)
+          }
+          request(options, function(err, res, body) {
+            if (!err && res.statusCode == 200) {
+              console.log(body)
             }
-            this.context.log('upload successful', res, body)
           })
-
-          // axios.post(url, data, {headers: data.getHeaders()})
-          //   .then(res => {
-          //     this.context.log(res)
-          //     this.context.log('reply audio response')
-          //     const getDuration = require('get-audio-duration')
-          //     let audioDuration
-          //     getDuration(downloadPath)
-          //       .then(duration => {audioDuration = duration})
-          //       .catch(() => {audioDuration = 1})
-          //       .finally(() => {
-          //         return this.client.replyMessage(replyToken, {
-          //           type: 'audio',
-          //           originalContentUrl: `${process.env.BASE_URL}/tempfile/${path.basename(downloadPath)}`,
-          //           duration: audioDuration*1000
-          //         })
-          //       })
-          //   })
         })
-        // .catch(err => {this.context.log(`axios post error: ${err}`)})
     }
     else {
       return Promise.resolve(null)

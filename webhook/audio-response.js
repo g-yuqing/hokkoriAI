@@ -64,7 +64,10 @@ module.exports = class AudioResponse {
     return this.client.getMessageContent(messageId)
       .then(stream => new Promise((resolve, reject) => {
         const writable = fs.createWriteStream(downloadPath)
-        stream.pipe(writable)
+        // stream.pipe(writable)
+        stream.on('data', chunk => {
+          writable.write(chunk)
+        })
         stream.on('end', () => resolve(downloadPath))
         stream.on('error', reject)
       }))

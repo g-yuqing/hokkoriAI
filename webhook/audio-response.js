@@ -1,5 +1,6 @@
 const axios = require('axios')
 const FormData = require('form-data')
+const fs = require('fs')
 
 module.exports = class AudioResponse {
   constructor(lineClient, context, isDebug) {
@@ -17,18 +18,22 @@ module.exports = class AudioResponse {
             'Content-Type': 'multipart/form-data'
           },
         }
+      this.context.log('message information: ')
+      this.context.log(message)
       this.client.getMessageContent(message.id)
-        .then(stream => {
-          this.context.log('content of stream')
-          let data = new FormData()
-          data.append('audio', stream)
-          // this.context.log(stream)
-          axios.post(url, data, config)
-            .then(res => {
-              this.context.log(res)
-            })
-        })
-        .catch(err => {this.context.log(`axios post error: ${err}`)})
+        // .then(stream => {
+        //   this.context.log('content of stream')
+        //   let data = new FormData()
+        //   data.append('audio', stream)
+        //   axios.post(url, data, config)
+        //     .then(res => {
+        //       this.context.log(res)
+        //     })
+        // })
+        // .catch(err => {this.context.log(`axios post error: ${err}`)})
+        .then(stream => new Promise((resolve, reject) => {
+          // const writable = fs.createWriteStream()
+        }))
     }
     else {
       return Promise.resolve(null)

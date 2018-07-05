@@ -21,6 +21,7 @@ module.exports = class AudioResponse {
       this.client.getMessageContent(message.id)
         .then(stream => {
           stream.on('data', chunck => {
+            this.context.log(typeof(chunck))
             this.context.log(chunck)
           })
         })

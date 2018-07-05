@@ -18,9 +18,12 @@ module.exports = class AudioResponse {
             'Content-Type': 'multipart/form-data'
           },
         }
-      this.context.log('message information: ')
-      this.context.log(message)
       this.client.getMessageContent(message.id)
+        .then(stream => {
+          stream.on('data', chunck => {
+            this.context.log(chunck)
+          })
+        })
         // .then(stream => {
         //   this.context.log('content of stream')
         //   let data = new FormData()
@@ -31,9 +34,6 @@ module.exports = class AudioResponse {
         //     })
         // })
         // .catch(err => {this.context.log(`axios post error: ${err}`)})
-        .then(stream => new Promise((resolve, reject) => {
-          // const writable = fs.createWriteStream()
-        }))
     }
     else {
       return Promise.resolve(null)

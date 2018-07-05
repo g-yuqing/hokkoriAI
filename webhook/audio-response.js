@@ -1,4 +1,4 @@
-const FormData = require('form-data')
+// const FormData = require('form-data')
 const fs = require('fs')
 const path = require('path')
 const request = require('request')
@@ -11,23 +11,18 @@ module.exports = class AudioResponse {
   }
   replyMessage(replyToken, message) {
     if(this.isDebug == 'false') {
-      const url = 'https://yuqingguan.top/audio',
-        downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a')
+      const downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a'),
+        url = 'https://yuqingguan.top/audio'
       this.downloadAudio(message.id, downloadPath)
         .then(() => {
           this.context.log('AudioResponse: file saved, send messages to 3rd server')
-          const data = new FormData()
-          data.append('file', fs.createReadStream(downloadPath))
-          this.context.log(data.getHeaders())
-          this.context.log(data)
           // data.append('audio', fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a')))
-          const options = {
-            url: url,
-            method: 'POST',
-            headers: data.getHeaders(),
-            formData: data
+          const formData = {
+            // method: 'POST',
+            'file': fs.createReadStream(downloadPath),
+            'timeout': 180000
           }
-          request(options, function(err, res, body) {
+          request.post({url: url, formData:formData}, function(err, res, body) {
             if (!err && res.statusCode == 200) {
               this.context.log(body)
             }

@@ -22,7 +22,9 @@ module.exports = class AudioResponse {
             'file': fs.createReadStream(downloadPath),
             'timeout': 180000
           }
-          request.post({url: url, formData:formData}, function(err, res, body) {
+          this.context.log(formData)
+          this.context.log('init over')
+          request.post({url: url, formData: formData}, function(err, res, body) {
             if (!err && res.statusCode == 200) {
               this.context.log(body)
             }

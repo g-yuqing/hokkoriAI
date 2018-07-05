@@ -12,7 +12,7 @@ module.exports = class AudioResponse {
   replyMessage(replyToken, message) {
     if(this.isDebug == 'false') {
       const downloadPath = path.join(__dirname, 'downloaded', `${message.id}.m4a`)
-      return this.downloadContent(message.id, downloadPath)
+      return this.downloadAudio(message.id, downloadPath)
         .then((downloadPath) => {
           const getDuration = require('get-audio-duration')
           let audioDuration

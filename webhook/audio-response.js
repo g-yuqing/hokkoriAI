@@ -18,20 +18,20 @@ module.exports = class AudioResponse {
             'Content-Type': 'multipart/form-data'
           },
         }
+      let data = new FormData()
+      let chunckCount = 0
       this.client.getMessageContent(message.id)
         .then(stream => {
-          let data = new FormData()
-          let chunckCount = 0
           stream.on('data', chunck => {
             data.append(`buffer${chunckCount}`, chunck)
             chunckCount += 1
             this.context.log(`in: ${chunckCount}`)
-            // this.context.log(typeof(chunck))
-            // this.context.log(chunck)
           })
           stream.on('error', err => {
             this.context.log(err)
           })
+        })
+        .then(() => {
           this.context.log(chunckCount)
           this.context.log(data)
         })

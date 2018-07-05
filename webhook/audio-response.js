@@ -27,7 +27,7 @@ module.exports = class AudioResponse {
       //         this.context.log(res)
       //       })
       //   })
-      const readable = fs.createReadStream('./sample.m4a')
+      const readable = fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a'))
       this.context.log(readable)
       const data = new FormData()
       data.append('audio', readable)

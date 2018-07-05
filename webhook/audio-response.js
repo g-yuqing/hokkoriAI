@@ -15,9 +15,11 @@ module.exports = class AudioResponse {
         downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a')
       this.downloadAudio(message.id, downloadPath)
         .then(() => {
-          this.context.log('AudioResponse: send messages to 3rd server')
+          this.context.log('AudioResponse: file saved, send messages to 3rd server')
           const data = new FormData()
           data.append('file', fs.createReadStream(downloadPath))
+          this.context.log(data.getHeaders())
+          this.context.log(data)
           // data.append('audio', fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a')))
           const options = {
             url: url,

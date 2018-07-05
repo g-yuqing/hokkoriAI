@@ -23,6 +23,10 @@ module.exports = class AudioResponse {
           this.context.log('AudioResponse: send messages to 3rd server')
           const data = new FormData()
           data.append('audio', fs.createReadStream(downloadPath))
+          this.client.getMessageContent(message.id)
+            .then(stream => {
+              this.context.log('===========', stream == fs.createReadStream(downloadPath))
+            })
           this.context.log(data)
           axios.post(url, data, config)
             .then(res => {
@@ -64,10 +68,7 @@ module.exports = class AudioResponse {
     return this.client.getMessageContent(messageId)
       .then(stream => new Promise((resolve, reject) => {
         const writable = fs.createWriteStream(downloadPath)
-        // stream.pipe(writable)
-        stream.on('data', chunk => {
-          writable.write(chunk)
-        })
+        stream.pipe(writable)
         stream.on('end', () => resolve(downloadPath))
         stream.on('error', reject)
       }))

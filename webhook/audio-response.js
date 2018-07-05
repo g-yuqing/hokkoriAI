@@ -20,14 +20,19 @@ module.exports = class AudioResponse {
         }
       this.client.getMessageContent(message.id)
         .then(stream => {
+          let data = new FormData()
+          let chunckCount = 0
           this.context.log(`===stream info: ${stream}`)
           stream.on('data', chunck => {
-            this.context.log(typeof(chunck))
-            this.context.log(chunck)
+            data.append(chunckCount, chunck)
+            chunckCount += 1
+            // this.context.log(typeof(chunck))
+            // this.context.log(chunck)
           })
           stream.on('error', err => {
             this.context.log(err)
           })
+          console.log(data)
         })
         // .then(stream => {
         //   this.context.log('content of stream')

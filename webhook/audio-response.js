@@ -26,7 +26,16 @@ module.exports = class AudioResponse {
           this.context.log(data)
           axios.post(url, data, config)
             .then(res => {
-              this.contex.log(res)
+              this.context.log(res)
+              this.context.log('reply audio response')
+              const getDuration = require('get-audio-duration')
+              let audioDuration
+              getDuration(downloadPath)
+                .then(duration => {audioDuration = duration})
+                .catch(() => {audioDuration = 1})
+                .finally(() => {
+                  return this.client.replyMessage(replyToken, {type: 'audio', duration: audioDuration*1000})
+                })
             })
         })
         .catch(err => {this.context.log(`axios post error: ${err}`)})

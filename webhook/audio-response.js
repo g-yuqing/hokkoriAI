@@ -18,14 +18,22 @@ module.exports = class AudioResponse {
           },
         },
         downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a')
-      this.client.getMessageContent(message.id)
-        .then(stream => {
-          const data = new FormData()
-          data.append('audio', stream)
-          axios.post(url, data, config)
-            .then(res => {
-              this.context.log(res)
-            })
+      // this.client.getMessageContent(message.id)
+      //   .then(stream => {
+      //     const data = new FormData()
+      //     data.append('audio', stream)
+      //     axios.post(url, data, config)
+      //       .then(res => {
+      //         this.context.log(res)
+      //       })
+      //   })
+      const readable = fs.createReadStream('./sample.m4a')
+      this.context.log(readable)
+      const data = new FormData()
+      data.append('audio', readable)
+      axios.post(url, data, {headers: data.getHeaders(),})
+        .then(res => {
+          this.context.log(res)
         })
       // this.downloadAudio(message.id, downloadPath)
       //   .then(() => {

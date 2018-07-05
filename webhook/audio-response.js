@@ -11,51 +11,53 @@ module.exports = class AudioResponse {
   }
   replyMessage(replyToken, message) {
     if(this.isDebug == 'false') {
-      const url = 'https://yuqingguan.top/audio',
-        config = {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-        },
-        downloadPath = path.join(__dirname, 'tempfile', 'audio.wav')
-      this.downloadAudio(message.id, downloadPath)
-        .then(() => {
-          this.context.log('AudioResponse: send messages to 3rd server')
-          const data = new FormData()
-          data.append('audio', fs.createReadStream(downloadPath))
-          this.client.getMessageContent(message.id)
-            .then(stream => {
-              this.context.log('===========', stream == fs.createReadStream(downloadPath))
-            })
-          this.context.log(data)
-          axios.post(url, data, config)
-            .then(res => {
-              this.context.log(res)
-              this.context.log('reply audio response')
-              const getDuration = require('get-audio-duration')
-              let audioDuration
-              getDuration(downloadPath)
-                .then(duration => {audioDuration = duration})
-                .catch(() => {audioDuration = 1})
-                .finally(() => {
-                  return this.client.replyMessage(replyToken, {
-                    type: 'audio',
-                    originalContentUrl: `${process.env.BASE_URL}/tempfile/${path.basename(downloadPath)}`,
-                    duration: audioDuration*1000
-                  })
+      const downloadPath = path.join(__dirname, 'downloaded', `${message.id}.m4a`)
+      return this.downloadContent(message.id, downloadPath)
+        .then((downloadPath) => {
+          const getDuration = require('get-audio-duration')
+          let audioDuration
+          getDuration(downloadPath)
+            .then((duration) => { audioDuration = duration })
+            .catch(error => { audioDuration = 1 })
+            .finally(() => {
+              return this.client.replyMessage(
+                replyToken,
+                {
+                  type: 'audio',
+                  originalContentUrl: '/downloaded/' + path.basename(downloadPath),
+                  duration: audioDuration * 1000,
                 })
             })
         })
-        .catch(err => {this.context.log(`axios post error: ${err}`)})
-      // this.client.getMessageContent(message.id)
-      //   .then(stream => {
-      //     this.context.log('content of stream')
-      //     let data = new FormData()
-      //     data.append('audio', stream)
+      // const url = 'https://yuqingguan.top/audio',
+      //   config = {
+      //     headers: {
+      //       'Content-Type': 'multipart/form-data'
+      //     },
+      //   },
+      //   downloadPath = path.join(__dirname, 'tempfile', 'audio.wav')
+      // this.downloadAudio(message.id, downloadPath)
+      //   .then(() => {
+      //     this.context.log('AudioResponse: send messages to 3rd server')
+      //     const data = new FormData()
+      //     data.append('audio', fs.createReadStream(downloadPath))
       //     this.context.log(data)
       //     axios.post(url, data, config)
       //       .then(res => {
       //         this.context.log(res)
+      //         this.context.log('reply audio response')
+      //         const getDuration = require('get-audio-duration')
+      //         let audioDuration
+      //         getDuration(downloadPath)
+      //           .then(duration => {audioDuration = duration})
+      //           .catch(() => {audioDuration = 1})
+      //           .finally(() => {
+      //             return this.client.replyMessage(replyToken, {
+      //               type: 'audio',
+      //               originalContentUrl: `${process.env.BASE_URL}/tempfile/${path.basename(downloadPath)}`,
+      //               duration: audioDuration*1000
+      //             })
+      //           })
       //       })
       //   })
       //   .catch(err => {this.context.log(`axios post error: ${err}`)})

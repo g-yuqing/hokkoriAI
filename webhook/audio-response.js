@@ -34,7 +34,11 @@ module.exports = class AudioResponse {
                 .then(duration => {audioDuration = duration})
                 .catch(() => {audioDuration = 1})
                 .finally(() => {
-                  return this.client.replyMessage(replyToken, {type: 'audio', duration: audioDuration*1000})
+                  return this.client.replyMessage(replyToken, {
+                    type: 'audio',
+                    originalContentUrl: `${process.env.BASE_URL}/tempfile/${path.basename(downloadPath)}`,
+                    duration: audioDuration*1000
+                  })
                 })
             })
         })

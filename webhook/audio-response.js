@@ -27,7 +27,10 @@ module.exports = class AudioResponse {
           }
           request(options, function(err, res, body) {
             if (!err && res.statusCode == 200) {
-              console.log(body)
+              this.context.log(body)
+            }
+            else {
+              this.context.log(`upload error: ${err}`)
             }
           })
         })

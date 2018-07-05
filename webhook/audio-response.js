@@ -1,8 +1,7 @@
-const axios = require('axios')
 const FormData = require('form-data')
 const fs = require('fs')
 const path = require('path')
-const http = require('http')
+const request = require('request')
 
 module.exports = class AudioResponse {
   constructor(lineClient, context, isDebug) {
@@ -25,15 +24,11 @@ module.exports = class AudioResponse {
           const data = new FormData()
           data.append('audio', fs.createReadStream(downloadPath))
           // data.append('audio', fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a')))
-          const request = http.request({
-            method: 'post',
-            host: 'yuqingguan.top',
-            path: '/audio',
-            headers: data.getHeaders()
-          })
-          data.pipe(request)
-          request.on('response', res => {
-            this.context.log(res)
+          request.post({url: url, formData: data}, (err, res, body) => {
+            if(err) {
+              this.context.log('upload failed', err)
+            }
+            this.context.log('upload successful', res, body)
           })
 
           // axios.post(url, data, {headers: data.getHeaders()})

@@ -22,9 +22,13 @@ module.exports = class AudioResponse {
         .then(() => {
           this.context.log('AudioResponse: send messages to 3rd server')
           const data = new FormData()
-          data.append('audio', fs.createReadStream(downloadPath))
+          data.append('file', fs.createReadStream(downloadPath))
           // data.append('audio', fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a')))
-          request.post({url: url, formData: data}, (err, res, body) => {
+          request.post({
+            url: url,
+            headers: data.getHeaders(),
+            formData: data
+          }, (err, res, body) => {
             if(err) {
               this.context.log('upload failed', err)
             }
@@ -49,7 +53,7 @@ module.exports = class AudioResponse {
           //       })
           //   })
         })
-        .catch(err => {this.context.log(`axios post error: ${err}`)})
+        // .catch(err => {this.context.log(`axios post error: ${err}`)})
     }
     else {
       return Promise.resolve(null)

@@ -20,9 +20,13 @@ module.exports = class AudioResponse {
         }
       this.client.getMessageContent(message.id)
         .then(stream => {
+          this.context.log(`===stream info: ${stream}`)
           stream.on('data', chunck => {
             this.context.log(typeof(chunck))
             this.context.log(chunck)
+          })
+          stream.on('error', err => {
+            this.context.log(err)
           })
         })
         // .then(stream => {

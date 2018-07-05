@@ -23,7 +23,7 @@ module.exports = class AudioResponse {
           let data = new FormData()
           let chunckCount = 0
           stream.on('data', chunck => {
-            data.append(chunckCount, chunck)
+            data.append(`buffer${chunckCount}`, chunck)
             chunckCount += 1
             // this.context.log(typeof(chunck))
             // this.context.log(chunck)
@@ -31,6 +31,7 @@ module.exports = class AudioResponse {
           stream.on('error', err => {
             this.context.log(err)
           })
+          this.context.log(chunckCount)
           this.context.log(data)
         })
         // .then(stream => {

@@ -26,7 +26,9 @@ module.exports = class AudioResponse {
           this.context.log('init over')
           request.post({url: url, formData: formData}, function(err, res, body) {
             if (!err && res.statusCode == 200) {
+              this.context.log('body')
               this.context.log(body)
+              this.context.log(body.fussy, body.hungry, body.pain)
             }
             else {
               this.context.log(`upload error: ${err}`)

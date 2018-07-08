@@ -24,11 +24,21 @@ module.exports = class AudioResponse {
           }
           axios.post(url, form, config)
             .then(res => {
-              const reply = {
-                type: 'text',
-                text: res.data.fussy
+              const replyText = {
+                fussy: '泣きの理由がなさそうです',
+                hungry: 'お腹が空いてるようです',
+                pain: '痛みを感じているようです'
               }
-              this.context.log(res.data)
+              let reply = {
+                type: 'text',
+                text: ''
+              }
+              for(const key in res.data) {
+                if(res.data[key] == 1) {
+                  reply.text = replyText[key]
+                }
+                break
+              }
               return this.client.replyMessage(replyToken, reply)
             })
             .catch(err => {this.context.log(`axios post error: ${err}`)})

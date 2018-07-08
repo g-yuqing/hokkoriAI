@@ -1,7 +1,6 @@
 const FormData = require('form-data')
 const fs = require('fs')
 const path = require('path')
-const request = require('request')
 const axios = require('axios')
 
 
@@ -25,7 +24,12 @@ module.exports = class AudioResponse {
           }
           axios.post(url, form, config)
             .then(res => {
-              this.context.log(res)
+              const reply = {
+                type: 'text',
+                text: res.data.fussy
+              }
+              this.context.log(res.data)
+              return this.client.replyMessage(replyToken, reply)
             })
             .catch(err => {this.context.log(`axios post error: ${err}`)})
           // const formData = {

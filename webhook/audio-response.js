@@ -16,13 +16,11 @@ module.exports = class AudioResponse {
       this.downloadAudio(message.id, downloadPath)
         .then(() => {
           this.context.log('AudioResponse: file saved, send messages to 3rd server')
-          // data.append('audio', fs.createReadStream(path.join(__dirname, 'tempfile', 'sample.m4a')))
           const formData = {
             // method: 'POST',
             'file': fs.createReadStream(downloadPath),
-            'timeout': 180000
+            // 'timeout': 180000
           }
-          this.context.log(formData)
           this.context.log('init over')
           request.post({url: url, formData: formData}, function(err, res, body) {
             if (!err && res.statusCode == 200) {
@@ -38,6 +36,7 @@ module.exports = class AudioResponse {
               return this.client.replyMessage(replyToken, reply)
             }
             else {
+              this.context.log('error')
               this.context.log(`upload error: ${err}`)
               const reply = {
                 type: 'text',
@@ -46,6 +45,7 @@ module.exports = class AudioResponse {
               return this.client.replyMessage(replyToken, reply)
             }
           })
+          this.context.log('after post code')
         })
     }
     else {

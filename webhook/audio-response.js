@@ -17,12 +17,13 @@ module.exports = class AudioResponse {
         .then(() => {
           this.context.log('AudioResponse: file saved, send messages to 3rd server')
           const formData = {
-            // method: 'POST',
             'file': fs.createReadStream(downloadPath),
             // 'timeout': 180000
           }
           this.context.log('init over')
           request.post({url: url, formData: formData}, function(err, res, body) {
+            this.context.log('working?')
+            this.context.log(body)
             if (!err && res.statusCode == 200) {
               this.context.log('body')
               this.context.log(body)
@@ -45,7 +46,6 @@ module.exports = class AudioResponse {
               return this.client.replyMessage(replyToken, reply)
             }
           })
-          this.context.log('after post code')
         })
     }
     else {

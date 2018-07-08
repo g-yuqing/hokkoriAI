@@ -29,9 +29,21 @@ module.exports = class AudioResponse {
               this.context.log('body')
               this.context.log(body)
               this.context.log(body.fussy, body.hungry, body.pain)
+              this.context.log('res')
+              this.context.log(res)
+              const reply = {
+                type: 'text',
+                text: 'processed'
+              }
+              return this.client.replyMessage(replyToken, reply)
             }
             else {
               this.context.log(`upload error: ${err}`)
+              const reply = {
+                type: 'text',
+                text: 'error happened'
+              }
+              return this.client.replyMessage(replyToken, reply)
             }
           })
         })

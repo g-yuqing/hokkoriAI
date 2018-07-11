@@ -89,7 +89,6 @@ module.exports = function(context, req) {
     if (event.type === 'message') {
       if (event.message.type === 'text') {
         const replyContent = {
-          {
           type: 'template',
           altText: 'Confirm alt text',
           template: {

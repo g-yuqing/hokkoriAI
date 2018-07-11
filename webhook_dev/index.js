@@ -100,7 +100,7 @@ module.exports = function(context, req) {
             ],
           },
         }
-        return client.replyText(event.replyToken, replyContent)
+        return client.replyMessage(event.replyToken, replyContent)
       }
       else if(event.message.type === 'audio') {
         // // process

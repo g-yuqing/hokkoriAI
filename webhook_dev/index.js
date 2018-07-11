@@ -56,9 +56,7 @@
 // };
 
 const line = require('@line/bot-sdk')
-const CosmosDbLog = require('./cosmosdb/log')
-const TextResponse = require('./text-response')
-const AudioResponse = require('./audio-response')
+// const AudioResponse = require('./audio-response')
 
 
 const config = {
@@ -66,14 +64,8 @@ const config = {
   channelSecret: process.env.CHANNEL_SECRET
 }
 const client = new line.Client(config)
-const dbLog = new CosmosDbLog()
-dbLog.getDatabase()
-  .then(() => {console.log('CosmosDb connected successfully')})
-  .catch(error => {console.log(`CosmosDb connected with error ${JSON.stringify(error)}`)})
 
 module.exports = function(context, req) {
-  const textRes = new TextResponse(client, context, process.env.IS_DEBUG)
-  const audioRes = new AudioResponse(client, context, process.env.IS_DEBUG)
   context.log('JavaScript HTTP trigger function processed a request.')
   if (!req.body || !req.body.events) {
     context.res = {
@@ -96,16 +88,6 @@ module.exports = function(context, req) {
   function handleEvent(event) {
     if (event.type === 'message') {
       if (event.message.type === 'text') {
-        // // process
-        // const reply = textRes.replyMessage(event.replyToken, {
-        //   type: 'text',
-        //   text: event.message.text
-        // })
-        // // save text to cosmosdb
-        // const saveDoc = dbLog.saveDocument({'id': event.message.id, 'body': event})
-        //   .then(() => {console.log('CosmosDb saved successfully')})
-        //   .catch(error => {console.log(`CosmosDb saved with error ${JSON.stringify(error)}`)})
-        // return Promise.all([saveDoc, reply])
         const replyContent = {
           type: 'template',
           altText: 'Buttons alt text',

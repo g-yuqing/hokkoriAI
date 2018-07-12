@@ -101,7 +101,11 @@ module.exports = function(context, req) {
           },
         }
         context.log(replyContent)
-        return client.replyMessage(event.replyToken, event.message.text)
+        const reply = {
+          type: 'text',
+          text: event.message.text
+        }
+        return client.replyMessage(event.replyToken, reply)
       }
       else if(event.message.type === 'audio') {
         // // process

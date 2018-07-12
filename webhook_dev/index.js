@@ -93,13 +93,14 @@ module.exports = function(context, req) {
           altText: 'Confirm alt text',
           template: {
             type: 'confirm',
-            text: 'Do it?',
+            text: event.message.text,
             actions: [
               { label: 'Yes', type: 'message', text: 'Yes!' },
               { label: 'No', type: 'message', text: 'No!' },
             ],
           },
         }
+        context.log(reply)
         return client.replyMessage(event.replyToken, reply)
       }
       else if(event.message.type === 'audio') {

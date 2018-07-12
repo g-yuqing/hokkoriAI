@@ -105,10 +105,11 @@ module.exports = function(context, req) {
           text: event.message.text
         }
         context.log(reply)
-        context.log(client.replyMessage(event.replyToken, reply))
-        return Promise.all([client.replyMessage(event.replyToken, reply)])
+        return client.replyMessage(event.replyToken, reply)
       }
       else if(event.message.type === 'audio') {
+        context.log('...')
+        return Promise.resolve(null)
         // // process
         // context.log('start audio processing')
         // const reply = audioRes.replyMessage(event.replyToken, event.message)

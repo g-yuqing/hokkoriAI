@@ -104,7 +104,7 @@ module.exports = function(context, req) {
           type: 'text',
           text: event.message.text
         }
-        return Promise.all(client.replyMessage(event.replyToken, reply))
+        return Promise.all([client.replyMessage(event.replyToken, reply)])
       }
       else if(event.message.type === 'audio') {
         // // process

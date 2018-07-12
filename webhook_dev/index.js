@@ -88,7 +88,7 @@ module.exports = function(context, req) {
   function handleEvent(event) {
     if (event.type === 'message') {
       if (event.message.type === 'text') {
-        const replyContent = {
+        const reply = {
           type: 'template',
           altText: 'Confirm alt text',
           template: {
@@ -99,10 +99,6 @@ module.exports = function(context, req) {
               { label: 'No', type: 'message', text: 'No!' },
             ],
           },
-        }
-        const reply = {
-          type: 'text',
-          text: event.message.text
         }
         return client.replyMessage(event.replyToken, reply)
       }

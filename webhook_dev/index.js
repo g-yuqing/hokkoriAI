@@ -33,7 +33,7 @@ module.exports = function(context, req) {
     case 'message':
       switch(event.message.type) {
       case 'audio':
-        return audioReply(event, 'birth')
+        return audioReply(event, 'label')
       default:
         return client.replyMessage(event.replyToken, {
           type: 'text',
@@ -85,10 +85,10 @@ module.exports = function(context, req) {
           type: 'buttons',
           text: '泣きの原因を選んでください',
           actions: [
-            { type: 'message', label: '特に理由なし', data: 'FUSSY' },
-            { type: 'message', label: 'お腹が空いてる', data: 'HUNGRY' },
-            { type: 'message', label: 'どこか痛くしてる', data: 'PAIN' },
-            { type: 'message', label: 'そのほか', data: 'OTHER' }
+            { type: 'message', label: '特に理由なし', data: 'FUSSY', text: 1 },
+            { type: 'message', label: 'お腹が空いてる', data: 'HUNGRY', text: 2 },
+            { type: 'message', label: 'どこか痛くしてる', data: 'PAIN', text: 3 },
+            { type: 'message', label: 'そのほか', data: 'OTHER', text: 4 }
           ],
         },
       }

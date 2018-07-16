@@ -86,9 +86,9 @@ module.exports = function(context, req) {
           type: 'confirm',
           text: `${params}`,
           actions: [
-            { label: 'Yes', type: 'postback', text: 'はい!', data: 'YES' },
-            { label: 'No', type: 'postback', text: 'いいえ!', data: 'NO' },
-            { label: 'DISCARD', type: 'postback', text: 'やめる!', data: 'DISCARD' },
+            { type: 'postback', label: 'はい', text: 'はい!', data: 'YES' },
+            { type: 'postback', label: 'いいえ', text: 'いいえ!', data: 'NO' },
+            { type: 'postback', label: 'やめる', text: 'やめる!', data: 'DISCARD' },
           ],
         },
       }
@@ -96,7 +96,6 @@ module.exports = function(context, req) {
     else {
       reply = {}
     }
-    context.log(`===reply===: ${reply}`)
     return client.replyMessage(event.replyToken, reply)
   }
   function audioPostback(event) {
@@ -105,6 +104,7 @@ module.exports = function(context, req) {
       return audioReply(event, 'birth')
     }
     else if (data === 'DATE') {
+      context.log('==========date==========')
       return audioReply(event, 'confirm')
       // const temp = JSON.stringify(event.postback.params)
       // return client.replyMessage(event.replyToken, {

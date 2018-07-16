@@ -35,7 +35,7 @@ module.exports = function(context, req) {
       case 'text':
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: '音声で試してください'
+          text: '音声で入力してみてください'
         })
       case 'audio':
         return audioReply(event)
@@ -43,7 +43,7 @@ module.exports = function(context, req) {
         return
       }
     case 'postback':
-      break
+      return audioPostback(event)
     default:
       return Promise.resolve(null)
     }
@@ -81,14 +81,12 @@ module.exports = function(context, req) {
   function audioReply(event) {
     const reply = {
       type: 'template',
-      altText: 'datetime pickers alt text',
+      altText: 'date pickers alt text',
       template: {
         type: 'buttons',
-        text: 'select date',
+        text: '赤ちゃんの誕生日を選んでください',
         actions: [
-          { type: 'datetimepicker', label: 'date', data: 'DATE', mode: 'date' },
-          { type: 'datetimepicker', label: 'time', data: 'TIME', mode: 'time' },
-          { type: 'datetimepicker', label: 'datetime', data: 'DATETIME', mode: 'datetime' },
+          { type: 'datetimepicker', label: 'date', data: 'DATE', mode: 'date' }
         ],
       },
     }
@@ -96,5 +94,6 @@ module.exports = function(context, req) {
   }
   function audioPostback(event) {
     let data = event.postback.data
+    context.log(data)
   }
 }

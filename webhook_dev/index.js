@@ -96,8 +96,10 @@ module.exports = function(context, req) {
     let data = event.postback.data
     if(data === 'DATE') {
       const temp = JSON.stringify(event.postback.params)
-      context.log(temp)
-      return client.replyMessage(event.replyToken, `post content: ${temp}`)
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: `post content: ${temp}`
+      })
     }
   }
 }

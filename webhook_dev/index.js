@@ -35,14 +35,13 @@ module.exports = function(context, req) {
       case 'text':
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: '音声だけを入力してください'
+          text: '音声で試してください'
         })
       case 'audio':
         return audioReply()
       default:
-        break
+        return
       }
-      break
     case 'postback':
       break
     default:
@@ -97,22 +96,5 @@ module.exports = function(context, req) {
   }
   function audioPostback() {
     let data = event.postback.data
-
-  }
-
-  function test() {
-    const reply = {
-      type: 'template',
-      altText: 'Confirm alt text',
-      template: {
-        type: 'confirm',
-        text: event.message.text,
-        actions: [
-          { label: 'Yes', type: 'message', text: 'Yes!' },
-          { label: 'No', type: 'message', text: 'No!' },
-        ],
-      },
-    }
-    return client.replyMessage(event.replyToken, reply)
   }
 }

@@ -119,7 +119,7 @@ module.exports = function(context, req) {
       return client.replyMessage(
         event.replyToken, {
           type: 'text',
-          text: 'データを保存します、ありがとうございます！'
+          text: 'データを保存しました、ありがとうございます！'
         }
       )
     }

@@ -32,13 +32,15 @@ module.exports = function(context, req) {
     switch(event.type) {
     case 'message':
       switch(event.message.type) {
-      case 'audio':
-        return audioReply(event, 'label')
-      default:
+      case 'text':
         return client.replyMessage(event.replyToken, {
           type: 'text',
           text: '音声で入力してみてください'
         })
+      case 'audio':
+        return audioReply(event, 'label')
+      default:
+        return Promise.resolve(null)
       }
     case 'postback':
       return audioPostback(event)

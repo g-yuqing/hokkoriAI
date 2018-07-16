@@ -95,8 +95,9 @@ module.exports = function(context, req) {
   function audioPostback(event) {
     let data = event.postback.data
     if(data === 'DATE') {
-      context.log(event.postback.params)
-      return client.replyMessage(event.replyToken, `post content: ${event.postback.params}`)
+      const temp = JSON.stringify(event.postback.params)
+      context.log(temp)
+      return client.replyMessage(event.replyToken, `post content: ${temp}`)
     }
   }
 }

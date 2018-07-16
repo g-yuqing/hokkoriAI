@@ -115,7 +115,7 @@ module.exports = function(context, req) {
       // })
     }
     else if (data === 'NO') {
-      return audioReply(event, 'birth')
+      return audioReply(event, 'label')
     }
     else if (data === 'DISCARD') {
       return client.replyMessage(

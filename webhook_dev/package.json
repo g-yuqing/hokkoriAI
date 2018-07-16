@@ -19,5 +19,8 @@
   "dependencies": {
     "@line/bot-sdk": "^6.1.0",
     "documentdb": "^1.14.4"
+  },
+  "devDependencies": {
+    "eslint": "^5.1.0"
   }
 }

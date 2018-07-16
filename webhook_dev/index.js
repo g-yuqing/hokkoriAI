@@ -33,7 +33,7 @@ module.exports = function(context, req) {
     case 'message':
       switch(event.message.type) {
       case 'audio':
-        return audioReply(event, 'label')
+        return audioReply(event, 'birth')
       default:
         return client.replyMessage(event.replyToken, {
           type: 'text',

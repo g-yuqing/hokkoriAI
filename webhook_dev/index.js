@@ -125,6 +125,7 @@ module.exports = function(context, req) {
     else {
       reply = {}
     }
+    context.log(`===reply===: ${reply}`)
     return client.replyMessage(event.replyToken, reply)
   }
   function audioPostback(event) {
@@ -147,7 +148,7 @@ module.exports = function(context, req) {
       return client.replyMessage(
         event.replyToken, {
           type: 'text',
-          text: 'データの保存をやめました、ありがとうございます！'
+          text: 'データの保存をやめました、ありがとうございます'
         }
       )
     }

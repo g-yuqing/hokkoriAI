@@ -38,7 +38,7 @@ module.exports = function(context, req) {
           text: '音声で試してください'
         })
       case 'audio':
-        return audioReply()
+        return audioReply(event)
       default:
         return
       }

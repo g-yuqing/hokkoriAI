@@ -78,7 +78,7 @@ module.exports = function(context, req) {
     // }
   }
 
-  function audioReply() {
+  function audioReply(event) {
     const reply = {
       type: 'template',
       altText: 'datetime pickers alt text',
@@ -94,7 +94,7 @@ module.exports = function(context, req) {
     }
     return client.replyMessage(event.replyToken, reply)
   }
-  function audioPostback() {
+  function audioPostback(event) {
     let data = event.postback.data
   }
 }

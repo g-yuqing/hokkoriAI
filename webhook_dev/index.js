@@ -45,35 +45,6 @@ module.exports = function(context, req) {
     default:
       return Promise.resolve(null)
     }
-    // if (event.type === 'message') {
-    //   if (event.message.type === 'text') {
-    //     const reply = {
-    //       type: 'template',
-    //       altText: 'Confirm alt text',
-    //       template: {
-    //         type: 'confirm',
-    //         text: event.message.text,
-    //         actions: [
-    //           { label: 'Yes', type: 'message', text: 'Yes!' },
-    //           { label: 'No', type: 'message', text: 'No!' },
-    //         ],
-    //       },
-    //     }
-    //     context.log(reply)
-    //     return client.replyMessage(event.replyToken, reply)
-    //   }
-    //   else if(event.message.type === 'audio') {
-    //     return Promise.resolve(null)
-    //     // // process
-    //     // context.log('start audio processing')
-    //     // const reply = audioRes.replyMessage(event.replyToken, event.message)
-    //     // return Promise.all([reply])
-    //     // //TODO save audio to blob storage
-    //   }
-    // }
-    // else {
-    //   return Promise.resolve(null)
-    // }
   }
   function audioReply(event, type) {
     let reply = {}
@@ -85,10 +56,10 @@ module.exports = function(context, req) {
           type: 'buttons',
           text: '泣きの原因を選んでください',
           actions: [
-            { type: 'message', label: '特に理由なし', data: 'FUSSY', text: 1 },
-            { type: 'message', label: 'お腹が空いてる', data: 'HUNGRY', text: 2 },
-            { type: 'message', label: 'どこか痛くしてる', data: 'PAIN', text: 3 },
-            { type: 'message', label: 'そのほか', data: 'OTHER', text: 4 }
+            { type: 'postback', label: '特に理由なし', data: 'FUSSY', text: '特に理由なし' },
+            { type: 'postback', label: 'お腹が空いてる', data: 'HUNGRY', text: 'お腹が空いてる' },
+            { type: 'postback', label: 'どこか痛くしてる', data: 'PAIN', text: 'どこか痛くしてる' },
+            { type: 'postback', label: 'そのほか', data: 'OTHER', text: 'そのほか' }
           ],
         },
       }
@@ -115,9 +86,9 @@ module.exports = function(context, req) {
           type: 'confirm',
           text: `${params}`,
           actions: [
-            { label: 'Yes', type: 'message', text: 'はい!', data: 'YES' },
-            { label: 'No', type: 'message', text: 'いいえ!', data: 'NO' },
-            { label: 'DISCARD', type: 'message', text: 'やめる!', data: 'DISCARD' },
+            { label: 'Yes', type: 'postback', text: 'はい!', data: 'YES' },
+            { label: 'No', type: 'postback', text: 'いいえ!', data: 'NO' },
+            { label: 'DISCARD', type: 'postback', text: 'やめる!', data: 'DISCARD' },
           ],
         },
       }

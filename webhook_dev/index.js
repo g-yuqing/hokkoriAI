@@ -27,16 +27,11 @@ module.exports = function(context, req) {
         return context.done()
       })
   }
-
+  let tempInfo = {}
   function handleEvent(event) {
     switch(event.type) {
     case 'message':
       switch(event.message.type) {
-      // case 'text':
-      //   return client.replyMessage(event.replyToken, {
-      //     type: 'text',
-      //     text: '音声で入力してみてください'
-      //   })
       case 'audio':
         return audioReply(event, 'label')
       default:
@@ -80,14 +75,13 @@ module.exports = function(context, req) {
       }
     }
     else if(type === 'confirm') {
-      const params = JSON.stringify(event.postback.params)
-      context.log(params)
+      const params = event.postback.params
       reply = {
         type: 'template',
         altText: 'confirm alt text',
         template: {
           type: 'buttons',
-          text: 'confirm',//`${params}`,
+          text: `確認：${params.date}`,
           actions: [
             { type: 'postback', label: 'はい', text: 'はい!', data: 'YES' },
             { type: 'postback', label: 'いいえ', text: 'いいえ!', data: 'NO' },
@@ -104,10 +98,10 @@ module.exports = function(context, req) {
   function audioPostback(event) {
     const data = event.postback.data
     if(data === 'FUSSY' || data === 'HUNGRY' || data === 'PAIN' || data === 'OTHER') {
+      tempInfo[event.source.userId] = {label: data}
       return audioReply(event, 'birth')
     }
     else if (data === 'DATE') {
-      context.log('==========date==========')
       return audioReply(event, 'confirm')
     }
     else if (data === 'NO') {

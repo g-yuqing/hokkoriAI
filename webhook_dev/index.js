@@ -27,7 +27,6 @@ module.exports = function(context, req) {
         return context.done()
       })
   }
-  let tempInfo = {}
   function handleEvent(event) {
     switch(event.type) {
     case 'message':
@@ -98,7 +97,6 @@ module.exports = function(context, req) {
   function audioPostback(event) {
     const data = event.postback.data
     if(data === 'FUSSY' || data === 'HUNGRY' || data === 'PAIN' || data === 'OTHER') {
-      tempInfo[event.source.userId] = {label: data}
       return audioReply(event, 'birth')
     }
     else if (data === 'DATE') {

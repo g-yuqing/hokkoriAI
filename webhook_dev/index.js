@@ -78,13 +78,13 @@ module.exports = function(context, req) {
       }
     }
     else if(type === 'confirm') {
-      // const params = JSON.stringify(event.postback.params)
+      const params = JSON.stringify(event.postback.params)
       reply = {
         type: 'template',
         altText: 'confirm alt text',
         template: {
-          type: 'confirm',
-          text: '===confirm===',
+          type: 'buttons',
+          text: `${params}`,
           actions: [
             { type: 'postback', label: 'はい', text: 'はい!', data: 'YES' },
             { type: 'postback', label: 'いいえ', text: 'いいえ!', data: 'NO' },

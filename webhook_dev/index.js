@@ -1,12 +1,14 @@
 const line = require('@line/bot-sdk')
-// const AudioResponse = require('./audio-response')
+const azures = require('azure-storage')
 
 
-const config = {
+
+const client = new line.Client({
   channelAccessToken: process.env.ACCESS_TOKEN_DEV,
   channelSecret: process.env.CHANNEL_SECRET_DEV
-}
-const client = new line.Client(config)
+})
+const connectStr = process.env.BLOB_CONNECTION_STRING
+const blobService = azures.createBlobService(connectStr)
 
 module.exports = function(context, req) {
   context.log('JavaScript HTTP trigger function processed a request.')
@@ -32,6 +34,7 @@ module.exports = function(context, req) {
     case 'message':
       switch(event.message.type) {
       case 'audio':
+        audioSave(event)
         return audioReply(event, 'label')
       default:
         return Promise.resolve(null)
@@ -80,7 +83,7 @@ module.exports = function(context, req) {
         altText: 'confirm alt text',
         template: {
           type: 'buttons',
-          text: `確認：${params.date}`,
+          text: `誕生日は：${params.date}`,
           actions: [
             { type: 'postback', label: 'はい', text: 'はい!', data: 'YES' },
             { type: 'postback', label: 'いいえ', text: 'いいえ!', data: 'NO' },
@@ -124,5 +127,31 @@ module.exports = function(context, req) {
     else {
       return
     }
+  }
+  function audioSave(event) {
+    // current date
+    let today = new Date()
+    let dd = today.getDate()
+    let mm = today.getMonth()+1
+    if(dd<10) {
+      dd = `0${dd}`
+    }
+    if(mm<10) {
+      mm = `0${mm}`
+    }
+    today = `${today.getFullYear()}${mm}${dd}`
+    // userid
+    const userId = event.source.userId
+    const blobName = `${userId}_${today}.m4a`
+    const containerName = 'audio'
+    const blobStream = blobService.createWriteStreamToBlockBlob(containerName, blobName)
+    client.getMessageContent(event.message.id)
+      .then(stream => {
+        stream.on('end', () => {
+          context.log('audio end')
+          context.done()
+        })
+        stream.pipe(blobStream)
+      })
   }
 }

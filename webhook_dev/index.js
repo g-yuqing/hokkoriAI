@@ -129,22 +129,24 @@ module.exports = function(context, req) {
     }
   }
   function audioSave(event) {
-    // current date
-    let today = new Date()
-    let dd = today.getDate()
-    let mm = today.getMonth()+1
-    if(dd<10) {
-      dd = `0${dd}`
-    }
-    if(mm<10) {
-      mm = `0${mm}`
-    }
-    today = `${today.getFullYear()}${mm}${dd}`
-    // userid
-    const userId = event.source.userId
-    const blobName = `${userId}_${today}.m4a`
+    // // current date
+    // let today = new Date()
+    // let dd = today.getDate()
+    // let mm = today.getMonth()+1
+    // if(dd<10) {
+    //   dd = `0${dd}`
+    // }
+    // if(mm<10) {
+    //   mm = `0${mm}`
+    // }
+    // today = `${today.getFullYear()}${mm}${dd}`
+    // // userid
+    // const userId = event.source.userId
+    // const blobName = `${userId}_${today}.m4a`
+    context.log(connectStr)
     const containerName = 'audio'
-    const blobStream = blobService.createWriteStreamToBlockBlob(containerName, blobName)
+    // const blobStream = blobService.createWriteStreamToBlockBlob(containerName, blobName)
+    const blobStream = blobService.createWriteStreamToBlockBlob(containerName, `${event.message.id}.m4a`)
     client.getMessageContent(event.message.id)
       .then(stream => {
         stream.on('end', () => {

@@ -75,12 +75,13 @@ module.exports = function(context, req) {
     }
     else if(type === 'confirm') {
       const params = event.postback.params
+      context.log(`confirm: ${params}`)
       reply = {
         type: 'template',
         altText: 'confirm alt text',
         template: {
           type: 'buttons',
-          text: `${params}`,
+          text: '確認',
           actions: [
             { type: 'postback', label: 'はい', text: 'はい!', data: 'YES' },
             { type: 'postback', label: 'いいえ', text: 'いいえ!', data: 'NO' },
@@ -122,9 +123,9 @@ module.exports = function(context, req) {
         info.label = ''
         // remove temporary file
         const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
-        fs.unlink(sourceFilePath, function(error) {
-          if (error) {
-            throw error
+        fs.unlink(sourceFilePath, err => {
+          if(err) {
+            context.log(err)
           }
           context.log('temporary file deleted')
         })
@@ -141,7 +142,7 @@ module.exports = function(context, req) {
     }
   }
   function audioUpload(event, info) {
-    const blobName = `${info.label}_${event.source.userId}.m4a`
+    const blobName = `${info.label}_${event.source.userId}_${event.timestamp}.m4a`
     const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
     const containerName = 'audio'
     // upload

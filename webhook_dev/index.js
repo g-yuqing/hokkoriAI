@@ -133,7 +133,7 @@ module.exports = function(context, req) {
     })
   }
   function downloadAudio(messageId, downloadPath) {
-    return this.client.getMessageContent(messageId)
+    return client.getMessageContent(messageId)
       .then(stream => new Promise((resolve, reject) => {
         const writable = fs.createWriteStream(downloadPath)
         stream.pipe(writable)

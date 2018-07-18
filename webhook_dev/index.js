@@ -38,7 +38,7 @@ module.exports = function(context, req) {
   function handleEvent(event) {
     if(event.type === 'message') {
       if(event.message.type === 'audio') {
-        const downloadPath = path.join(__dirname, 'tempfile', `${event.message.id}.m4a`)
+        const downloadPath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
         downloadAudio(event.message.id, downloadPath)
         info.audio = true
         context.log(info)
@@ -121,7 +121,7 @@ module.exports = function(context, req) {
         info.audio = false
         info.label = ''
         // remove temporary file
-        const sourceFilePath = path.join(__dirname, 'tempfile', `${event.message.id}.m4a`)
+        const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
         fs.unlink(sourceFilePath, function(error) {
           if (error) {
             throw error
@@ -142,7 +142,7 @@ module.exports = function(context, req) {
   }
   function audioUpload(event, info) {
     const blobName = `${info.label}_${event.source.userId}.m4a`
-    const sourceFilePath = path.join(__dirname, 'tempfile', `${event.message.id}.m4a`)
+    const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
     const containerName = 'audio'
     // upload
     return new Promise((resolve, reject) => {

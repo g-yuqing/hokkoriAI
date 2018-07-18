@@ -11,7 +11,10 @@ const client = new line.Client({
 })
 const connectStr = process.env.BLOB_CONNECTION_STRING
 const blobService = storage.createBlobService(connectStr)
-let info = {}
+let info = {
+  audio: false,
+  label: '',
+}
 
 module.exports = function(context, req) {
   context.log('JavaScript HTTP trigger function processed a request.')
@@ -110,6 +113,22 @@ module.exports = function(context, req) {
       )
     }
     else if (data === 'YES') {
+      if(info.audio && (info.label === 'FUSSY' || info.label === 'HUNGRY' ||
+                        info.label === 'PAIN' || info.label === 'HUNGRY')) {
+        // upload
+        audioUpload(event, info)
+        // init info
+        info.audio = false
+        info.label = ''
+        // remove temporary file
+        const sourceFilePath = path.join(__dirname, 'tempfile', `${event.message.id}.m4a`)
+        fs.unlink(sourceFilePath, function(error) {
+          if (error) {
+            throw error
+          }
+          context.log('temporary file deleted')
+        })
+      }
       return client.replyMessage(
         event.replyToken, {
           type: 'text',
@@ -121,8 +140,8 @@ module.exports = function(context, req) {
       return
     }
   }
-  function audioUpload(event, label) {
-    const blobName = `${label}_${event.source.userId}.m4a`
+  function audioUpload(event, info) {
+    const blobName = `${info.label}_${event.source.userId}.m4a`
     const sourceFilePath = path.join(__dirname, 'tempfile', `${event.message.id}.m4a`)
     const containerName = 'audio'
     // upload

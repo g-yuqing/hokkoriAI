@@ -1,5 +1,7 @@
 const line = require('@line/bot-sdk')
-const azures = require('azure-storage')
+const storage = require('azure-storage')
+const path = require('path')
+const fs = require('fs')
 
 
 
@@ -8,7 +10,7 @@ const client = new line.Client({
   channelSecret: process.env.CHANNEL_SECRET_DEV
 })
 const connectStr = process.env.BLOB_CONNECTION_STRING
-const blobService = azures.createBlobService(connectStr)
+const blobService = storage.createBlobService(connectStr)
 
 module.exports = function(context, req) {
   context.log('JavaScript HTTP trigger function processed a request.')
@@ -30,18 +32,20 @@ module.exports = function(context, req) {
       })
   }
   function handleEvent(event) {
-    switch(event.type) {
-    case 'message':
-      switch(event.message.type) {
-      case 'audio':
-        audioSave(event)
+    if(event.type === 'message') {
+      if(event.message.type === 'audio') {
+        const downloadPath = path.join(__dirname, 'tempfile', `${event.message.id}.m4a`)
+        downloadAudio(event.message.id, downloadPath)
         return audioReply(event, 'label')
-      default:
+      }
+      else {
         return Promise.resolve(null)
       }
-    case 'postback':
+    }
+    else if(event.type === 'postback') {
       return audioPostback(event)
-    default:
+    }
+    else {
       return Promise.resolve(null)
     }
   }
@@ -63,19 +67,6 @@ module.exports = function(context, req) {
         },
       }
     }
-    else if(type === 'birth') {
-      reply = {
-        type: 'template',
-        altText: 'date pickers alt text',
-        template: {
-          type: 'buttons',
-          text: '赤ちゃんの誕生日を選んでください',
-          actions: [
-            { type: 'datetimepicker', label: 'date', data: 'DATE', mode: 'date' }
-          ],
-        },
-      }
-    }
     else if(type === 'confirm') {
       const params = event.postback.params
       reply = {
@@ -83,7 +74,7 @@ module.exports = function(context, req) {
         altText: 'confirm alt text',
         template: {
           type: 'buttons',
-          text: `誕生日は：${params.date}`,
+          text: `${params}`,
           actions: [
             { type: 'postback', label: 'はい', text: 'はい!', data: 'YES' },
             { type: 'postback', label: 'いいえ', text: 'いいえ!', data: 'NO' },
@@ -100,9 +91,6 @@ module.exports = function(context, req) {
   function audioPostback(event) {
     const data = event.postback.data
     if(data === 'FUSSY' || data === 'HUNGRY' || data === 'PAIN' || data === 'OTHER') {
-      return audioReply(event, 'birth')
-    }
-    else if (data === 'DATE') {
       return audioReply(event, 'confirm')
     }
     else if (data === 'NO') {
@@ -128,32 +116,29 @@ module.exports = function(context, req) {
       return
     }
   }
-  function audioSave(event) {
-    // // current date
-    // let today = new Date()
-    // let dd = today.getDate()
-    // let mm = today.getMonth()+1
-    // if(dd<10) {
-    //   dd = `0${dd}`
-    // }
-    // if(mm<10) {
-    //   mm = `0${mm}`
-    // }
-    // today = `${today.getFullYear()}${mm}${dd}`
-    // // userid
-    // const userId = event.source.userId
-    // const blobName = `${userId}_${today}.m4a`
-    context.log(connectStr)
+  function audioUpload(event, label) {
+    const blobName = `${label}_${event.source.userId}.m4a`
+    const sourceFilePath = path.join(__dirname, 'tempfile', `${event.message.id}.m4a`)
     const containerName = 'audio'
-    // const blobStream = blobService.createWriteStreamToBlockBlob(containerName, blobName)
-    const blobStream = blobService.createWriteStreamToBlockBlob(containerName, `${event.message.id}.m4a`)
-    client.getMessageContent(event.message.id)
-      .then(stream => {
-        stream.on('end', () => {
-          context.log('audio end')
-          context.done()
-        })
-        stream.pipe(blobStream)
+    // upload
+    return new Promise((resolve, reject) => {
+      blobService.createBlockBlobFromLocalFile(containerName, blobName, sourceFilePath, err => {
+        if(err) {
+          reject(err)
+        }
+        else {
+          resolve({ message: `Upload of '${blobName}' complete` })
+        }
       })
+    })
+  }
+  function downloadAudio(messageId, downloadPath) {
+    return this.client.getMessageContent(messageId)
+      .then(stream => new Promise((resolve, reject) => {
+        const writable = fs.createWriteStream(downloadPath)
+        stream.pipe(writable)
+        stream.on('end', () => resolve(downloadPath))
+        stream.on('error', reject)
+      }))
   }
 }

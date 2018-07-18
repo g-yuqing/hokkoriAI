@@ -11,6 +11,7 @@ const client = new line.Client({
 })
 const connectStr = process.env.BLOB_CONNECTION_STRING
 const blobService = storage.createBlobService(connectStr)
+let info = {}
 
 module.exports = function(context, req) {
   context.log('JavaScript HTTP trigger function processed a request.')
@@ -36,6 +37,8 @@ module.exports = function(context, req) {
       if(event.message.type === 'audio') {
         const downloadPath = path.join(__dirname, 'tempfile', `${event.message.id}.m4a`)
         downloadAudio(event.message.id, downloadPath)
+        info.audio = true
+        context.log(info)
         return audioReply(event, 'label')
       }
       else {
@@ -91,6 +94,8 @@ module.exports = function(context, req) {
   function audioPostback(event) {
     const data = event.postback.data
     if(data === 'FUSSY' || data === 'HUNGRY' || data === 'PAIN' || data === 'OTHER') {
+      info.label = data
+      context.log(info)
       return audioReply(event, 'confirm')
     }
     else if (data === 'NO') {

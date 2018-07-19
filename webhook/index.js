@@ -2,6 +2,7 @@ const line = require('@line/bot-sdk')
 const CosmosDbLog = require('./cosmosdb/log')
 const TextResponse = require('./text-response')
 const AudioResponse = require('./audio-response')
+const FileResponse = require('./file-response')
 
 
 const config = {
@@ -17,6 +18,7 @@ dbLog.getDatabase()
 module.exports = function(context, req) {
   const textRes = new TextResponse(client, context, process.env.IS_DEBUG)
   const audioRes = new AudioResponse(client, context, process.env.IS_DEBUG)
+  const fileRes = new FileResponse(client, context, process.env.IS_DEBUG)
   context.log('JavaScript HTTP trigger function processed a request.')
   if (!req.body || !req.body.events) {
     context.res = {
@@ -56,6 +58,10 @@ module.exports = function(context, req) {
         const reply = audioRes.replyMessage(event.replyToken, event.message)
         return Promise.all([reply])
         //TODO save audio to blob storage
+      }
+      else if(event.message.type == 'file') {
+        const reply = fileRes.replyMessage(event.replyToken, event.message)
+        return Promise.all([reply])
       }
     }
     else {

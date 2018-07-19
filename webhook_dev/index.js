@@ -114,6 +114,7 @@ module.exports = function(context, req) {
       )
     }
     else if (data === 'YES') {
+      context.log(info)
       if(info.audio && (info.label === 'FUSSY' || info.label === 'HUNGRY' ||
                         info.label === 'PAIN' || info.label === 'HUNGRY')) {
         // upload

@@ -129,13 +129,21 @@ module.exports = function(context, req) {
           }
           context.log('temporary file deleted')
         })
+        return client.replyMessage(
+          event.replyToken, {
+            type: 'text',
+            text: 'データを保存しました、ありがとうございます！'
+          }
+        )
       }
-      return client.replyMessage(
-        event.replyToken, {
-          type: 'text',
-          text: 'データを保存しました、ありがとうございます！'
-        }
-      )
+      else {
+        return client.replyMessage(
+          event.replyToken, {
+            type: 'text',
+            text: 'すみません、最初から話をかけてください！'
+          }
+        )
+      }
     }
     else {
       return

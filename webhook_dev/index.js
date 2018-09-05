@@ -39,6 +39,10 @@ module.exports = function(context, req) {
   function handleEvent(event) {
     if(event.type === 'message') {
       if(event.message.type === 'audio') {
+        // init info
+        info.gender = false
+        info.age = false
+        info.data = {}
         const downloadPath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
         downloadAudio(event.message.id, downloadPath)
         context.log(info)

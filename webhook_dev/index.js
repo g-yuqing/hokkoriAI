@@ -76,7 +76,7 @@ module.exports = function(context, req) {
       }
     }
     else if(type === 'age') {
-      info.gender = true
+      // info.gender = true
       reply = {
         type: 'template',
         altText: 'age pickers alt text',
@@ -94,7 +94,7 @@ module.exports = function(context, req) {
       }
     }
     else if(type === 'confirm') {
-      info.age = true
+      // info.age = true
       const params = event.postback.params
       context.log(`confirm: ${params}`)
       reply = {

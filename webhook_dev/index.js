@@ -45,7 +45,7 @@ module.exports = function(context, req) {
         info.data = {}
         const downloadPath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
         downloadAudio(event.message.id, downloadPath)
-        context.log(info)
+        context.log('init state: ', info)
         return audioReply(event, 'gender')
       }
       else {
@@ -60,7 +60,6 @@ module.exports = function(context, req) {
     }
   }
   function audioReply(event, type) {
-    context.log('in audioReply', type)
     let reply = {}
     if(type === 'gender') {
       reply = {
@@ -78,6 +77,7 @@ module.exports = function(context, req) {
     }
     else if(type === 'age') {
       info.gender = true
+      context.log('audioReply-age:', info)
       reply = {
         type: 'template',
         altText: 'age pickers alt text',
@@ -121,7 +121,6 @@ module.exports = function(context, req) {
     const data = event.postback.data
     if(data === 'MALE' || data === 'FEMALE') {
       info.data.gender = data
-      context.log(info)
       return audioReply(event, 'age')
     }
     else if(data === '0-6' || data === '6-12' || data === '12-24' || data === '24-48' || data === '48-0') {
@@ -140,7 +139,6 @@ module.exports = function(context, req) {
       )
     }
     else if (data === 'YES') {
-      context.log(info)
       if(info.gender && info.age) {
         // upload
         uploadAudio(event, info)

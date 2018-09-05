@@ -12,8 +12,9 @@ const client = new line.Client({
 const connectStr = process.env.BLOB_CONNECTION_STRING
 const blobService = storage.createBlobService(connectStr)
 let info = {
-  audio: false,
-  label: '',
+  gender: false,
+  age: false,
+  data: {},
 }
 
 module.exports = function(context, req) {
@@ -40,9 +41,8 @@ module.exports = function(context, req) {
       if(event.message.type === 'audio') {
         const downloadPath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
         downloadAudio(event.message.id, downloadPath)
-        info.audio = true
         context.log(info)
-        return audioReply(event, 'label')
+        return audioReply(event, 'gender')
       }
       else {
         return Promise.resolve(null)
@@ -57,23 +57,40 @@ module.exports = function(context, req) {
   }
   function audioReply(event, type) {
     let reply = {}
-    if(type === 'label') {
+    if(type === 'gender') {
       reply = {
         type: 'template',
-        altText: 'label pickers alt text',
+        altText: 'gender pickers alt text',
         template: {
           type: 'buttons',
-          text: '泣きの原因を選んでください',
+          text: '赤ちゃんの性別を選んでください',
           actions: [
-            { type: 'postback', label: '特に理由なし', data: 'FUSSY', text: '特に理由なし' },
-            { type: 'postback', label: 'お腹が空いてる', data: 'HUNGRY', text: 'お腹が空いてる' },
-            { type: 'postback', label: 'どこか痛くしてる', data: 'PAIN', text: 'どこか痛くしてる' },
-            { type: 'postback', label: 'そのほか', data: 'OTHER', text: 'そのほか' }
+            { type: 'postback', label: '男の子', data: 'MALE', text: '男の子' },
+            { type: 'postback', label: '女の子', data: 'FEMALE', text: '女の子' }
+          ],
+        },
+      }
+    }
+    else if(type === 'age') {
+      info.gender = true
+      reply = {
+        type: 'template',
+        altText: 'age pickers alt text',
+        template: {
+          type: 'buttons',
+          text: '赤ちゃんの年齢を選んでください',
+          actions: [
+            { type: 'postback', label: '０ヶ月~６ヶ月', data: '0-6', text: '０ヶ月~６ヶ月' },
+            { type: 'postback', label: '６ヶ月~１歳', data: '6-12', text: '６ヶ月~１歳' },
+            { type: 'postback', label: '１歳~２歳', data: '12-24', text: '１歳~２歳' },
+            { type: 'postback', label: '２歳〜４歳', data: '24-48', text: '２歳〜４歳' },
+            { type: 'postback', label: '４歳以上', data: '48-0', text: '４歳以上' }
           ],
         },
       }
     }
     else if(type === 'confirm') {
+      info.age = true
       const params = event.postback.params
       context.log(`confirm: ${params}`)
       reply = {
@@ -97,15 +114,19 @@ module.exports = function(context, req) {
   }
   function audioPostback(event) {
     const data = event.postback.data
-    if(data === 'FUSSY' || data === 'HUNGRY' || data === 'PAIN' || data === 'OTHER') {
-      info.label = data
+    if(data === 'MALE' || data === 'FEMALE') {
+      info.data.gender = data
       context.log(info)
+      return audioReply(event, 'age')
+    }
+    else if(data === '0-6' || data === '6-12' || data === '12-24' || data === '24-48' || data === '48-0') {
+      info.data.age = data
       return audioReply(event, 'confirm')
     }
-    else if (data === 'NO') {
-      return audioReply(event, 'label')
+    else if(data === 'NO') {
+      return audioReply(event, 'gender')
     }
-    else if (data === 'DISCARD') {
+    else if(data === 'DISCARD') {
       return client.replyMessage(
         event.replyToken, {
           type: 'text',
@@ -115,13 +136,13 @@ module.exports = function(context, req) {
     }
     else if (data === 'YES') {
       context.log(info)
-      if(info.audio && (info.label === 'FUSSY' || info.label === 'HUNGRY' ||
-                        info.label === 'PAIN' || info.label === 'HUNGRY')) {
+      if(info.gender && info.age) {
         // upload
-        audioUpload(event, info)
+        uploadAudio(event, info)
         // init info
-        info.audio = false
-        info.label = ''
+        info.gender = false
+        info.age = false
+        info.data = {}
         // remove temporary file
         const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
         fs.unlink(sourceFilePath, err => {
@@ -150,8 +171,8 @@ module.exports = function(context, req) {
       return
     }
   }
-  function audioUpload(event, info) {
-    const blobName = `${info.label}_${event.source.userId}_${event.timestamp}.m4a`
+  function uploadAudio(event, info) {
+    const blobName = `${info.data.gender}_${info.data.age}_${event.source.userId}_${event.timestamp}.m4a`
     const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
     const containerName = 'audio'
     // upload

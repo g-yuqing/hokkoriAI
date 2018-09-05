@@ -87,17 +87,15 @@ module.exports = function(context, req) {
           actions: [
             { type: 'postback', label: '０ヶ月~６ヶ月', data: '0-6', text: '０ヶ月~６ヶ月' },
             { type: 'postback', label: '６ヶ月~１歳', data: '6-12', text: '６ヶ月~１歳' },
-            { type: 'postback', label: '１歳~２歳', data: '12-24', text: '１歳~２歳' },
-            { type: 'postback', label: '２歳〜４歳', data: '24-48', text: '２歳〜４歳' },
-            { type: 'postback', label: '４歳以上', data: '48-0', text: '４歳以上' }
+            { type: 'postback', label: '１歳~２歳', data: '12-24', text: '１歳~２歳' }
+            // { type: 'postback', label: '２歳〜４歳', data: '24-48', text: '２歳〜４歳' },
+            // { type: 'postback', label: '４歳以上', data: '48-0', text: '４歳以上' }
           ],
         },
       }
     }
     else if(type === 'confirm') {
       info.age = true
-      const params = event.postback.params
-      context.log(`confirm: ${params}`)
       reply = {
         type: 'template',
         altText: 'confirm alt text',
@@ -121,7 +119,7 @@ module.exports = function(context, req) {
     const data = event.postback.data
     if(data === 'MALE' || data === 'FEMALE') {
       info.data.gender = data
-      return audioReply(event, 'confirm')
+      return audioReply(event, 'age')
     }
     else if(data === '0-6' || data === '6-12' || data === '12-24' || data === '24-48' || data === '48-0') {
       info.data.age = data

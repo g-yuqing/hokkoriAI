@@ -121,7 +121,7 @@ module.exports = function(context, req) {
     const data = event.postback.data
     if(data === 'MALE' || data === 'FEMALE') {
       info.data.gender = data
-      return audioReply(event, 'age')
+      return audioReply(event, 'confirm')
     }
     else if(data === '0-6' || data === '6-12' || data === '12-24' || data === '24-48' || data === '48-0') {
       info.data.age = data

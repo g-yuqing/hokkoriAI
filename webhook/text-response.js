@@ -86,6 +86,8 @@ module.exports = class TextResponse {
             const reply = replyList.map(d => {
               return {type: 'text',text: d}
             })
+            this.context.log(replyList)
+            this.context.log(reply)
             return this.client.replyMessage(replyToken, reply)
           }
         })

@@ -146,7 +146,7 @@ module.exports = function(context, req) {
     else if(data === 'BIRTH') {
       const birthdayStr = JSON.stringify(event.postback.params).date
       //calculate age
-      context.log(birthdayStr)
+      context.log(JSON.stringify(event.postback.params))
       const birthday = new Date(birthdayStr),
         today = new Date()
       let diff =(today.getTime() - birthday.getTime()) / 1000

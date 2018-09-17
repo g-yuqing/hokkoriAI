@@ -36,7 +36,8 @@ module.exports = class TextResponse {
           //   type: 'text',
           //   text: res.data.answers[0].answer
           // }
-          const data = res.data
+          const data = res.data.answers[0].answer
+          this.context.log(data)
           const replyList = []
           let temp = 0,
             flag = 0

@@ -14,6 +14,7 @@ const blobService = storage.createBlobService(connectStr)
 let info = {
   gender: false,
   age: false,
+  file: false,
   data: {},
 }
 
@@ -42,6 +43,7 @@ module.exports = function(context, req) {
         // init info
         info.gender = false
         info.age = false
+        info.file = false
         info.data = {}
         const downloadPath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
         downloadAudio(event.message.id, downloadPath)
@@ -62,51 +64,72 @@ module.exports = function(context, req) {
   function audioReply(event, type) {
     let reply = {}
     if(type === 'gender') {
-      reply = {
-        type: 'template',
-        altText: 'gender pickers alt text',
-        template: {
-          type: 'buttons',
-          text: '赤ちゃんの性別を選んでください',
-          actions: [
-            { type: 'postback', label: '男の子', data: 'MALE', text: '男の子' },
-            { type: 'postback', label: '女の子', data: 'FEMALE', text: '女の子' }
-          ],
-        },
+      info.file = true
+      if(info.file) {
+        reply = {
+          type: 'template',
+          altText: 'gender pickers alt text',
+          template: {
+            type: 'buttons',
+            text: '赤ちゃんの性別を選んでください',
+            actions: [
+              { type: 'postback', label: '男の子', data: 'MALE', text: '男の子' },
+              { type: 'postback', label: '女の子', data: 'FEMALE', text: '女の子' }
+            ],
+          },
+        }
+      }
+      else {
+        reply = {
+          type: 'text',
+          text: 'すみません、最初から話をかけてください！'
+        }
       }
     }
     else if(type === 'age') {
       info.gender = true
-      context.log('audioReply-age:', info)
-      reply = {
-        type: 'template',
-        altText: 'birthday pickers alt text',
-        template: {
-          type: 'buttons',
-          text: '赤ちゃんの誕生日を選んでください',
-          actions: [
-            { type: 'datetimepicker', label: 'date', data: 'BIRTH', mode: 'date'}
-            // { type: 'postback', label: '０ヶ月~６ヶ月', data: '0-6', text: '０ヶ月~６ヶ月' },
-            // { type: 'postback', label: '６ヶ月~１歳', data: '6-12', text: '６ヶ月~１歳' },
-            // { type: 'postback', label: '１歳~２歳', data: '12-24', text: '１歳~２歳' }
-          ],
-        },
+      if(info.file && info.gender) {
+        reply = {
+          type: 'template',
+          altText: 'birthday pickers alt text',
+          template: {
+            type: 'buttons',
+            text: '赤ちゃんの誕生日を選んでください',
+            actions: [
+              { type: 'datetimepicker', label: 'date', data: 'BIRTH', mode: 'date'}
+            ],
+          },
+        }
+      }
+      else {
+        reply = {
+          type: 'text',
+          text: 'すみません、最初から話をかけてください！'
+        }
       }
     }
     else if(type === 'confirm') {
       info.age = true
-      reply = {
-        type: 'template',
-        altText: 'confirm alt text',
-        template: {
-          type: 'buttons',
-          text: '確認',
-          actions: [
-            { type: 'postback', label: 'はい', text: 'はい!', data: 'YES' },
-            { type: 'postback', label: 'いいえ', text: 'いいえ!', data: 'NO' },
-            { type: 'postback', label: 'やめる', text: 'やめる!', data: 'DISCARD' },
-          ],
-        },
+      if(info.file && info.gender && info.age) {
+        reply = {
+          type: 'template',
+          altText: 'confirm alt text',
+          template: {
+            type: 'buttons',
+            text: '確認',
+            actions: [
+              { type: 'postback', label: 'はい', text: 'はい!', data: 'YES' },
+              { type: 'postback', label: 'いいえ', text: 'いいえ!', data: 'NO' },
+              { type: 'postback', label: 'やめる', text: 'やめる!', data: 'DISCARD' },
+            ],
+          },
+        }
+      }
+      else {
+        reply = {
+          type: 'text',
+          text: 'すみません、最初から話をかけてください！'
+        }
       }
     }
     else {
@@ -120,10 +143,6 @@ module.exports = function(context, req) {
       info.data.gender = data
       return audioReply(event, 'age')
     }
-    // else if(data === '0-6' || data === '6-12' || data === '12-24' || data === '24-48' || data === '48-0') {
-    //   info.data.age = data
-    //   return audioReply(event, 'confirm')
-    // }
     else if(data === 'BIRTH') {
       const birthdayStr = JSON.stringify(event.postback.params).date
       //calculate age
@@ -145,7 +164,7 @@ module.exports = function(context, req) {
         }
       )
     }
-    else if (data === 'YES') {
+    else if(data === 'YES') {
       context.log('in Yes')
       if(info.gender && info.age) {
         // upload
@@ -154,6 +173,7 @@ module.exports = function(context, req) {
         // reset info
         info.gender = false
         info.age = false
+        info.file = false
         info.data = {}
         // remove temporary file
         const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
@@ -184,6 +204,7 @@ module.exports = function(context, req) {
     }
   }
   function uploadAudio(event, info) {
+    context.log('in upload func')
     const blobName = `${info.data.gender}_${info.data.age}_${event.source.userId}_${event.timestamp}.m4a`
     const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
     const containerName = 'audio'

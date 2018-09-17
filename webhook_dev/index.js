@@ -125,7 +125,7 @@ module.exports = function(context, req) {
     //   info.data.age = data
     //   return audioReply(event, 'confirm')
     // }
-    else if(data === 'DATE') {
+    else if(data === 'BIRTH') {
       this.context.log(JSON.stringify(event.postback.params))
       info.data.age = 1
       return audioReply(event, 'confirm')

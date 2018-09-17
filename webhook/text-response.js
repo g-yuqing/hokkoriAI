@@ -78,7 +78,7 @@ module.exports = class TextResponse {
             for(let i=0;i<dataLen;i++) {
               const d = data[i]
               temp += d
-              if(d=='。'&&i>=replyCount) {
+              if(d=='。'&&temp.length>=replyCount) {
                 replyList.push(temp)
                 temp = ''
               }

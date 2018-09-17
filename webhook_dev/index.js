@@ -154,9 +154,17 @@ module.exports = function(context, req) {
       return audioReply(event, 'confirm')
     }
     else if(data === 'NO') {
+      info.gender = false
+      info.age = false
+      info.file = false
+      info.data = {}
       return audioReply(event, 'gender')
     }
     else if(data === 'DISCARD') {
+      info.gender = false
+      info.age = false
+      info.file = false
+      info.data = {}
       return client.replyMessage(
         event.replyToken, {
           type: 'text',
@@ -165,10 +173,8 @@ module.exports = function(context, req) {
       )
     }
     else if(data === 'YES') {
-      context.log('in Yes')
       if(info.gender && info.age) {
         // upload
-        context.log('upload')
         uploadAudio(event, info)
         // reset info
         info.gender = false
@@ -204,7 +210,6 @@ module.exports = function(context, req) {
     }
   }
   function uploadAudio(event, info) {
-    context.log('in upload func')
     const blobName = `${info.data.gender}_${info.data.age}_${event.source.userId}_${event.timestamp}.m4a`
     const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
     const containerName = 'audio'

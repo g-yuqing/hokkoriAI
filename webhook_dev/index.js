@@ -95,7 +95,7 @@ module.exports = function(context, req) {
     }
     else if(type === 'confirm') {
       info.age = true
-      this.context.log('in confirm')
+      context.log('in confirm')
       reply = {
         type: 'template',
         altText: 'confirm alt text',
@@ -126,7 +126,7 @@ module.exports = function(context, req) {
     //   return audioReply(event, 'confirm')
     // }
     else if(data === 'BIRTH') {
-      this.context.log(JSON.stringify(event.postback.params))
+      context.log(JSON.stringify(event.postback.params))
       info.data.age = 1
       return audioReply(event, 'confirm')
     }

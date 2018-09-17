@@ -33,12 +33,6 @@ module.exports = class AudioResponse {
                 type: 'text',
                 text: ''
               }
-              // for(const key in res.data) {
-              //   if(res.data[key] == 1) {
-              //     reply.text = replyText[key]
-              //   }
-              //   break
-              // }
               const obj = res.data
               const key = Object.keys(obj).reduce((a, b) => obj[a] > obj[b] ? a : b)
               reply.text = replyText[key]

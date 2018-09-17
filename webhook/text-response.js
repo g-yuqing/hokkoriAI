@@ -31,11 +31,31 @@ module.exports = class TextResponse {
         }
       axios.post(url, data, config)
         .then(res => {
-          this.context.log(res.data)
-          const reply = {
-            type: 'text',
-            text: res.data.answers[0].answer
+          // this.context.log(res.data)
+          // const reply = {
+          //   type: 'text',
+          //   text: res.data.answers[0].answer
+          // }
+          const data = res.data
+          const replyList = []
+          let temp = 0,
+            flag = 0
+          for(let i=0;i<data.length;i++) {
+            const d = data[i]
+            temp += d
+            if(d=='。'&&flag==1) {
+              replyList.push(temp)
+              temp = ''
+              flag = 0
+              continue
+            }
+            if(d=='。'&&flag==0){
+              flag += 1
+            }
           }
+          const reply = replyList.map(d => {
+            return {type: 'text',text: d}
+          })
           return this.client.replyMessage(replyToken, reply)
         })
         .catch(err => {this.context.log(`axios post error: ${err}`)})

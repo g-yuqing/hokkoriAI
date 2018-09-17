@@ -80,16 +80,15 @@ module.exports = function(context, req) {
       context.log('audioReply-age:', info)
       reply = {
         type: 'template',
-        altText: 'age pickers alt text',
+        altText: 'birthday pickers alt text',
         template: {
           type: 'buttons',
-          text: '赤ちゃんの年齢を選んでください',
+          text: '赤ちゃんの誕生日を選んでください',
           actions: [
+            // { type: 'datetimepicker', label: 'date', data: 'BIRTH', mode: 'date'}
             { type: 'postback', label: '０ヶ月~６ヶ月', data: '0-6', text: '０ヶ月~６ヶ月' },
             { type: 'postback', label: '６ヶ月~１歳', data: '6-12', text: '６ヶ月~１歳' },
             { type: 'postback', label: '１歳~２歳', data: '12-24', text: '１歳~２歳' }
-            // { type: 'postback', label: '２歳〜４歳', data: '24-48', text: '２歳〜４歳' },
-            // { type: 'postback', label: '４歳以上', data: '48-0', text: '４歳以上' }
           ],
         },
       }

@@ -144,7 +144,7 @@ module.exports = function(context, req) {
       return audioReply(event, 'age')
     }
     else if(data === 'BIRTH') {
-      const birthdayStr = `(${JSON.stringify(event.postback.params)})`
+      const birthdayStr = `(${JSON.stringify(event.postback.params)})`[0].date
       //JSON.stringify(event.postback.params)['date']
       //calculate age
       context.log(birthdayStr)

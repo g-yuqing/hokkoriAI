@@ -181,14 +181,14 @@ module.exports = function(context, req) {
         info.age = false
         info.file = false
         info.data = {}
-        // remove temporary file
-        const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
-        fs.unlink(sourceFilePath, err => {
-          if(err) {
-            context.log(err)
-          }
-          context.log('temporary file deleted')
-        })
+        // // remove temporary file
+        // const sourceFilePath = path.join(__dirname, 'tempfile', `${event.source.userId}.m4a`)
+        // fs.unlink(sourceFilePath, err => {
+        //   if(err) {
+        //     context.log(err)
+        //   }
+        //   context.log('temporary file deleted')
+        // })
         return client.replyMessage(
           event.replyToken, {
             type: 'text',

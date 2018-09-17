@@ -31,33 +31,63 @@ module.exports = class TextResponse {
         }
       axios.post(url, data, config)
         .then(res => {
-          // this.context.log(res.data)
-          // const reply = {
-          //   type: 'text',
-          //   text: res.data.answers[0].answer
-          // }
           const data = res.data.answers[0].answer
+          const dataLen = data.length
           this.context.log(data)
-          const replyList = []
-          let temp = '',
-            flag = 0
-          for(let i=0;i<data.length;i++) {
-            const d = data[i]
-            temp += d
-            if(d=='。'&&flag==1) {
-              replyList.push(temp)
-              temp = ''
-              flag = 0
-              continue
+          if(dataLen <= 60) {
+            const reply = {
+              type: 'text',
+              text: data
             }
-            if(d=='。'&&flag==0){
-              flag += 1
-            }
+            return this.client.replyMessage(replyToken, reply)
           }
-          const reply = replyList.map(d => {
-            return {type: 'text',text: d}
-          })
-          return this.client.replyMessage(replyToken, reply)
+          else {
+            // const replyList = []
+            // let temp = '',
+            //   flag = 0
+            // for(let i=0;i<data.length;i++) {
+            //   const d = data[i]
+            //   temp += d
+            //   if(d=='。'&&flag==1) {
+            //     replyList.push(temp)
+            //     temp = ''
+            //     flag = 0
+            //     continue
+            //   }
+            //   if(d=='。'&&flag==0){
+            //     flag += 1
+            //   }
+            // }
+            const replyList = []
+            let replyNum = 5
+            switch(dataLen) {
+            case dataLen<150:
+              replyNum = 2
+              break
+            case dataLen<220:
+              replyNum = 3
+              break
+            case dataLen<300:
+              replyNum = 4
+              break
+            default:
+              replyNum = 5
+            }
+            const replyCount = dataLen / replyNum
+            let temp = ''
+            for(let i=0;i<dataLen;i++) {
+              const d = data[i]
+              temp += d
+              if(d=='。'&&i>=replyCount) {
+                replyList.push(temp)
+                temp = ''
+              }
+            }
+            const reply = replyList.map(d => {
+              return {type: 'text',text: d}
+            })
+            return this.client.replyMessage(replyToken, reply)
+          }
         })
         .catch(err => {this.context.log(`axios post error: ${err}`)})
     }

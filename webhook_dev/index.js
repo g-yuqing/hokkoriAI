@@ -126,8 +126,13 @@ module.exports = function(context, req) {
     //   return audioReply(event, 'confirm')
     // }
     else if(data === 'BIRTH') {
-      context.log(JSON.stringify(event.postback.params))
-      info.data.age = 1
+      const birthdayStr = JSON.stringify(event.postback.params).date
+      //calculate age
+      const birthday = new Date(birthdayStr),
+        today = new Date()
+      let diff =(today.getTime() - birthday.getTime()) / 1000
+      diff /= (60 * 60 * 24 * 7 * 4)
+      info.data.age = Math.abs(Math.round(diff))
       return audioReply(event, 'confirm')
     }
     else if(data === 'NO') {

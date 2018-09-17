@@ -85,10 +85,10 @@ module.exports = function(context, req) {
           type: 'buttons',
           text: '赤ちゃんの誕生日を選んでください',
           actions: [
-            // { type: 'datetimepicker', label: 'date', data: 'BIRTH', mode: 'date'}
-            { type: 'postback', label: '０ヶ月~６ヶ月', data: '0-6', text: '０ヶ月~６ヶ月' },
-            { type: 'postback', label: '６ヶ月~１歳', data: '6-12', text: '６ヶ月~１歳' },
-            { type: 'postback', label: '１歳~２歳', data: '12-24', text: '１歳~２歳' }
+            { type: 'datetimepicker', label: 'date', data: 'BIRTH', mode: 'date'}
+            // { type: 'postback', label: '０ヶ月~６ヶ月', data: '0-6', text: '０ヶ月~６ヶ月' },
+            // { type: 'postback', label: '６ヶ月~１歳', data: '6-12', text: '６ヶ月~１歳' },
+            // { type: 'postback', label: '１歳~２歳', data: '12-24', text: '１歳~２歳' }
           ],
         },
       }
@@ -120,8 +120,13 @@ module.exports = function(context, req) {
       info.data.gender = data
       return audioReply(event, 'age')
     }
-    else if(data === '0-6' || data === '6-12' || data === '12-24' || data === '24-48' || data === '48-0') {
-      info.data.age = data
+    // else if(data === '0-6' || data === '6-12' || data === '12-24' || data === '24-48' || data === '48-0') {
+    //   info.data.age = data
+    //   return audioReply(event, 'confirm')
+    // }
+    else if(data === 'DATE') {
+      this.context.log(event.postback.params)
+      info.data.age = 1
       return audioReply(event, 'confirm')
     }
     else if(data === 'NO') {
@@ -139,7 +144,7 @@ module.exports = function(context, req) {
       if(info.gender && info.age) {
         // upload
         uploadAudio(event, info)
-        // init info
+        // reset info
         info.gender = false
         info.age = false
         info.data = {}

@@ -39,7 +39,7 @@ module.exports = class TextResponse {
           const data = res.data.answers[0].answer
           this.context.log(data)
           const replyList = []
-          let temp = 0,
+          let temp = '',
             flag = 0
           for(let i=0;i<data.length;i++) {
             const d = data[i]

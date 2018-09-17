@@ -95,7 +95,6 @@ module.exports = function(context, req) {
     }
     else if(type === 'confirm') {
       info.age = true
-      context.log('in confirm')
       reply = {
         type: 'template',
         altText: 'confirm alt text',
@@ -147,8 +146,10 @@ module.exports = function(context, req) {
       )
     }
     else if (data === 'YES') {
+      context.log('in Yes')
       if(info.gender && info.age) {
         // upload
+        context.log('upload')
         uploadAudio(event, info)
         // reset info
         info.gender = false

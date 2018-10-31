@@ -1,98 +1,61 @@
 const axios = require('axios')
+const Util = require('./Util')
+const util = new Util()
+const CosmosDbLog = require('./cosmosdb/log')
 
-module.exports = class TextResponse {
+class TextResponse {
   constructor(lineClient, context, isDebug) {
     this.client = lineClient
     this.context = context
     this.isDebug = isDebug
+    this.dbLog = new CosmosDbLog(this.context)
   }
-  replyMessage(replyToken, message) {
-    if(this.isDebug == 'false') {
+
+  async init() {
+    await this.dbLog.init()
+  }
+
+  async replyMessage(lineEvent) {
+    var replyToken = lineEvent.replyToken
+    var messageText = lineEvent.message.text
+    if (this.isDebug == false) {
       this.context.log('TextResponse: send messages to QnA Maker Service')
-      // // request to thrid server
-      // const url = `https://yuqingguan.top/text/${messages.text}`
-      // axios.get(url)
-      //   .then(res => {
-      //     const replyText = res.data
-      //     const reply = {
-      //       type: 'text',
-      //       text: replyText
-      //     }
-      //     return this.client.replyMessage(replyToken, reply)
-      //   })
-      // request to Auzre QnA Maker
-      const url = 'https://hokkoriai-qna.azurewebsites.net/qnamaker/knowledgebases/7a05a644-aacc-4177-b3af-73f3d249fe8f/generateAnswer',
-        data = {question: message.text},
+      const
+        url = 'https://hokkoriai-qna.azurewebsites.net/qnamaker/knowledgebases/7a05a644-aacc-4177-b3af-73f3d249fe8f/generateAnswer',
+        data = { question: messageText },
         config = {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'EndpointKey 0c088b78-4811-4565-b452-d121ae9075b1'
           },
         }
-      axios.post(url, data, config)
-        .then(res => {
-          const data = res.data.answers[0].answer
-          const dataLen = data.length
-          this.context.log(data)
-          if(dataLen <= 60) {
-            const reply = {
-              type: 'text',
-              text: data
-            }
-            return this.client.replyMessage(replyToken, reply)
+      try {
+        const res = await axios.post(url, data, config)
+        var reply = []
+        if (res.data.answers[0].score > 50) {
+          if (res.data.answers[0].score < 75) {
+            reply.push(util.generateTextMessage('お役に立てるか分かりませんが、こちらの回答はいかがでしょうか？'))
           }
-          else {
-            // const replyList = []
-            // let temp = '',
-            //   flag = 0
-            // for(let i=0;i<data.length;i++) {
-            //   const d = data[i]
-            //   temp += d
-            //   if(d=='。'&&flag==1) {
-            //     replyList.push(temp)
-            //     temp = ''
-            //     flag = 0
-            //     continue
-            //   }
-            //   if(d=='。'&&flag==0){
-            //     flag += 1
-            //   }
-            // }
-            const replyList = []
-            let replyNum = 5
-            switch(dataLen) {
-            case dataLen<150:
-              replyNum = 2
-              break
-            case dataLen<220:
-              replyNum = 3
-              break
-            case dataLen<300:
-              replyNum = 4
-              break
-            default:
-              replyNum = 5
-            }
-            const replyCount = dataLen / replyNum
-            let temp = ''
-            for(let i=0;i<dataLen;i++) {
-              const d = data[i]
-              temp += d
-              if(d=='。'&&temp.length>=replyCount) {
-                replyList.push(temp)
-                temp = ''
-              }
-            }
-            const reply = replyList.map(d => {
-              return {type: 'text',text: d}
-            })
-            return this.client.replyMessage(replyToken, reply)
-          }
-        })
-        .catch(err => {this.context.log(`axios post error: ${err}`)})
+          reply.push(util.generateTextMessage(res.data.answers[0].answer))
+          reply.push(this.generateFeedBackForm(lineEvent.message.id))
+          await this.dbLog.addItem({ 'id': lineEvent.message.id, 'body': lineEvent, 'answer': res.data.answers[0], 'feedback': '' })
+        } else {
+          reply.push(util.generateTextMessage('すいません。お力になれそうにありません。'))
+          reply.push(util.generateTextMessage('子育てに関して、知りたいことやお子さんの鳴き声を入力してください。'))
+          await this.dbLog.addItem({ 'id': lineEvent.message.id, 'body': lineEvent, 'answer': '', 'feedback': 'bad' })
+        }
+        await this.client.replyMessage(replyToken, reply)
+      } catch (err) {
+        this.context.log(`axios post error: ${err}`)
+      }
     }
     else {
-      return Promise.resolve(null)
+      return this.client.replyMessage(replyToken, util.generateTextMessage('Debug mode'))
     }
   }
+
+  generateFeedBackForm(id) {
+    return { type: 'template', altText: 'フィードバックフォーム', template: { type: 'buttons', title: 'フィードバックお願いします', text: 'この回答は役に立ちましたか？', actions: [{ type: 'postback', label: 'はい', data: `{"result": ${true}, "id": "${id}"}`, displayText: 'はい' }, { type: 'postback', label: 'いいえ', data: `{"result": ${false}, "id": "${id}"}`, displayText: 'いいえ' }] } }
+  }
 }
+module.exports = TextResponse

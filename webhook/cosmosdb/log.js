@@ -1,40 +1,70 @@
 'use strict'
-const documentClient = require('documentdb').DocumentClient,
-  config = require('./config')
+const CosmosClient = require("@azure/cosmos").CosmosClient;
 
-module.exports = class CosmosDbLog {
-  constructor() {
-    this._client = new documentClient(config.endpoint, {'masterKey': config.cosmosDbKey})
-    this._HttpStatusCodes = {NOTFOUND: 404}
-    this._databaseUrl = `dbs/${config.database.id}`
-    this._collectionUrl = `${this._databaseUrl}/colls/${config.collection.id}`
+const config = require('./config')
+
+class CosmosDbLog {
+  constructor(context) {
+    this._cosmosClient = new CosmosClient({ endpoint: config.endpoint, auth: { 'masterKey': config.cosmosDbKey } })
+    this._databaseId = config.database.id
+    this._collectionId = config.collection.id
+    this._database = null
+    this._container = null
+    this.context = context
   }
 
-  getDatabase() {
-    console.log(`Getting database:\n${config.database.id}\n`)
-    return new Promise((resolve, reject) => {
-      this._client.readDatabase(this._databaseUrl, (err, result) => {
-        if(err) {
-          reject(err)
-        }
-        else {
-          resolve(result)
-        }
-      })
-    })
+  async init() {
+    try {
+      const { dbResponse } = await this._cosmosClient.databases.createIfNotExists({ id: this._databaseId });
+      this._database = dbResponse
+      const { container } = await this._cosmosClient.database(this._databaseId).containers.createIfNotExists({ id: this._collectionId })
+      this._container = container
+    } catch (err) {
+      this.context.log('Something happen on the logger database init')
+      this.context.log(err)
+    }
   }
 
-  saveDocument(document) {
-    return new Promise((resolve, reject) => {
-      this._client.createDocument(this._collectionUrl, document, (err, created) => {
-        if (err) {
-          reject(err)
-        }
-        else {
-          resolve(created)
-        }
-      })
-    })
+  async addItem(item) {
+    const { body: doc } = await this._container.items.create(item)
+    return doc
+  }
+
+  async findById(id) {
+    try {
+      const querySpec = {
+        query: "SELECT * FROM root r WHERE r.id=@id",
+        parameters: [
+          {
+            name: "@id",
+            value: id
+          }
+        ]
+      }
+
+      const { result: results } = await this._container.items.query(querySpec).toArray()
+      return results
+    } catch (err) {
+      this.context.log('Find item from database was failed with the error below')
+      this.context.log(err)
+    }
+  }
+
+  async updateFeedback(id, fbResult) {
+    try {
+      this.context.log(id)
+      const doc = await this.findById(id)
+      if (doc.length == 0) {
+        this.context.log('Cannot find an item by id')
+        return
+      }
+      doc[0].feedback = fbResult
+      const { body: result } = await this._container.item(id).replace(doc[0])
+      return result
+    } catch (err) {
+      this.context.log('Update feedback from itemId was failed with the error below')
+      this.context.log(err)
+    }
   }
 }
-//https://docs.microsoft.com/en-us/azure/cosmos-db/sql-api-nodejs-get-started
+module.exports = CosmosDbLog

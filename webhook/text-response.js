@@ -40,8 +40,7 @@ class TextResponse {
           reply.push(this.generateFeedBackForm(lineEvent.message.id))
           await this.dbLog.addItem({ 'id': lineEvent.message.id, 'body': lineEvent, 'answer': res.data.answers[0], 'feedback': '' })
         } else {
-          reply.push(util.generateTextMessage('すいません。お力になれそうにありません。'))
-          reply.push(util.generateTextMessage('子育てに関して、知りたいことやお子さんの鳴き声を入力してください。'))
+          reply.push(util.generateTextMessage('すいません、分かりませんでした。別の言葉に言い換えていただけますか？'))
           await this.dbLog.addItem({ 'id': lineEvent.message.id, 'body': lineEvent, 'answer': '', 'feedback': 'bad' })
         }
         await this.client.replyMessage(replyToken, reply)

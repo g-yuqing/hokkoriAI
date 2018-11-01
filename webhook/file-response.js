@@ -2,49 +2,54 @@ const FormData = require('form-data')
 const fs = require('fs')
 const path = require('path')
 const axios = require('axios')
+require('tls').DEFAULT_ECDH_CURVE = 'auto'
 
-module.exports = class FileResponse {
+class FileResponse {
   constructor(lineClient, context, isDebug) {
     this.client = lineClient
     this.context = context
     this.isDebug = isDebug
   }
-  replyMessage(replyToken, message) {
+
+  async replyMessage(replyToken, message) {
     const ext = path.extname(message.fileName)
-    if(this.isDebug === 'false' && (ext === '.m4a' || ext === '.wav' || ext === '.mp3')) {
+    if (this.isDebug === 'false' && (ext === '.m4a' || ext === '.wav' || ext === '.mp3')) {
       const downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a'),
         url = 'https://yuqingguan.top/audio'
-      this.downloadAudio(message.id, downloadPath)
-        .then(() => {
-          this.context.log('AudioResponse: file saved, send messages to 3rd server')
-          const form = new FormData()
-          form.append('file', fs.createReadStream(downloadPath))
-          const config = {
-            headers: form.getHeaders()
-          }
-          axios.post(url, form, config)
-            .then(res => {
-              const replyText = {
-                fussy: '泣きの理由がなさそうです',
-                hungry: 'お腹が空いてるようです',
-                pain: '痛みを感じているようです'
-              }
-              let reply = {
-                type: 'text',
-                text: ''
-              }
-              const obj = res.data
-              const key = Object.keys(obj).reduce((a, b) => obj[a] > obj[b] ? a : b)
-              reply.text = replyText[key]
-              return this.client.replyMessage(replyToken, reply)
-            })
-            .catch(err => {this.context.log(`axios post error: ${err}`)})
-        })
+
+      try {
+        await this.downloadAudio(message.id, downloadPath)
+        this.context.log('AudioResponse: file saved, send messages to 3rd server')
+        const form = new FormData()
+        form.append('file', fs.createReadStream(downloadPath))
+        const config = {
+          headers: form.getHeaders()
+        }
+
+        const res = await axios.post(url, form, config)
+        const replyText = {
+          fussy: '泣きの理由がなさそうです',
+          hungry: 'お腹が空いてるようです',
+          pain: '痛みを感じているようです'
+        }
+        let reply = {
+          type: 'text',
+          text: ''
+        }
+        const obj = res.data
+        const key = Object.keys(obj).reduce((a, b) => obj[a] > obj[b] ? a : b)
+        reply.text = replyText[key]
+        await this.client.replyMessage(replyToken, reply)
+        return
+      } catch (err) {
+        this.context.log(`axios post error: ${err}`)
+      }
     }
     else {
-      return Promise.resolve(null)
+      return
     }
   }
+
   downloadAudio(messageId, downloadPath) {
     return this.client.getMessageContent(messageId)
       .then(stream => new Promise((resolve, reject) => {
@@ -55,3 +60,5 @@ module.exports = class FileResponse {
       }))
   }
 }
+
+module.exports = FileResponse

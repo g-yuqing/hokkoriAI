@@ -32,15 +32,26 @@ class TextResponse {
       try {
         const res = await axios.post(url, data, config)
         var reply = []
-        if (res.data.answers[0].score > 50) {
-          if (res.data.answers[0].score < 75) {
-            reply.push(util.generateTextMessage('お役に立てるか分かりませんが、こちらの回答はいかがでしょうか？'))
-          }
+        if (res.data.answers[0].score > 65) {
           reply.push(util.generateTextMessage(res.data.answers[0].answer))
           reply.push(this.generateFeedBackForm(lineEvent.message.id))
           await this.dbLog.addItem({ 'id': lineEvent.message.id, 'body': lineEvent, 'answer': res.data.answers[0], 'feedback': '' })
         } else {
-          reply.push(util.generateTextMessage('すいません、分かりませんでした。別の言葉に言い換えていただけますか？'))
+          const
+            elizaUrl = 'https://hokkoriaiv2.azurewebsites.net/reply',
+            data = {message: messageText},
+            config = {
+              headers: {
+                'Content-Type': 'application/json'
+              },
+            }
+          const elizaRes = await axios.post(elizaUrl, data);          
+          // const
+          //   elisaUrl = 'https://hokkoriai-eliza.azurewebsites.net/api/ReplyFucntion?code=81tSvorEPP46V0W5FTD/bGWUvMUm1g0jLfv8UNnWazthulzrW36MgA==',
+          //   data = {message: messageText}
+          // const elizaRes = await axios.post(elisaUrl, data);
+          this.context.log(elizaRes.data);
+          reply.push(util.generateTextMessage(elizaRes.data)); 
           await this.dbLog.addItem({ 'id': lineEvent.message.id, 'body': lineEvent, 'answer': '', 'feedback': 'bad' })
         }
         await this.client.replyMessage(replyToken, reply)

@@ -1,7 +1,6 @@
-const FormData = require('form-data')
 const fs = require('fs')
 const path = require('path')
-const axios = require('axios')
+const request = require('request-promise')
 require('tls').DEFAULT_ECDH_CURVE = 'auto'
 
 class FileResponse {
@@ -14,29 +13,27 @@ class FileResponse {
   async replyMessage(replyToken, message) {
     const ext = path.extname(message.fileName)
     if (this.isDebug === 'false' && (ext === '.m4a' || ext === '.wav' || ext === '.mp3')) {
-      const downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a'),
-        url = 'https://yuqingguan.top/audio'
-
+		const downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a'),
+       	 url = 'https://hokkoriaiv2.azurewebsites.net/api/audio?code=IVrbgLW1rSBVynREaNF0dc2X4O391/FobzDzAbJgA0kq6rm5nP/WvQ=='
       try {
         await this.downloadAudio(message.id, downloadPath)
         this.context.log('AudioResponse: file saved, send messages to 3rd server')
-        const form = new FormData()
-        form.append('file', fs.createReadStream(downloadPath))
-        const config = {
-          headers: form.getHeaders()
-        }
-
-        const res = await axios.post(url, form, config)
+        var formData = {
+          file: fs.createReadStream(downloadPath),
+        };
+        
+        const res = await request({ url: `${url}`, formData: formData })
+        this.context.log(res)
         const replyText = {
-          fussy: '泣きの理由がなさそうです',
-          hungry: 'お腹が空いてるようです',
-          pain: '痛みを感じているようです'
+            fussy: '泣きの理由がなさそうです',
+            hungry: 'お腹が空いてるようです',
+            pain: '痛みを感じているようです'
         }
         let reply = {
-          type: 'text',
-          text: ''
+            type: 'text',
+            text: ''
         }
-        const obj = res.data
+        const obj = JSON.parse(res)
         const key = Object.keys(obj).reduce((a, b) => obj[a] > obj[b] ? a : b)
         reply.text = replyText[key]
         await this.client.replyMessage(replyToken, reply)

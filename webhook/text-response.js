@@ -2,6 +2,9 @@ const axios = require('axios')
 const Util = require('./Util')
 const util = new Util()
 const CosmosDbLog = require('./cosmosdb/log')
+const QnaMaker = require('./qnamaker/QnaMaker')
+const Eliza = require('./Eliza/Eliza')
+const UserLog = require('./cosmosdb/UserLog')
 
 class TextResponse {
   constructor(lineClient, context, isDebug) {
@@ -9,6 +12,7 @@ class TextResponse {
     this.context = context
     this.isDebug = isDebug
     this.dbLog = new CosmosDbLog(this.context)
+    this.dbLog.init()
   }
 
   async init() {
@@ -20,38 +24,19 @@ class TextResponse {
     var messageText = lineEvent.message.text
     if (this.isDebug == false) {
       this.context.log('TextResponse: send messages to QnA Maker Service')
-      const
-        url = 'https://hokkoriai-qna.azurewebsites.net/qnamaker/knowledgebases/7a05a644-aacc-4177-b3af-73f3d249fe8f/generateAnswer',
-        data = { question: messageText },
-        config = {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'EndpointKey 0c088b78-4811-4565-b452-d121ae9075b1'
-          },
-        }
       try {
-        const res = await axios.post(url, data, config)
+        this.qnaMaker = new QnaMaker(this.context)
+        const res = await this.qnaMaker.GetQnaAnswer(messageText)
         var reply = []
         if (res.data.answers[0].score > 65) {
           reply.push(util.generateTextMessage(res.data.answers[0].answer))
           reply.push(this.generateFeedBackForm(lineEvent.message.id))
           await this.dbLog.addItem({ 'id': lineEvent.message.id, 'body': lineEvent, 'answer': res.data.answers[0], 'feedback': '' })
         } else {
-          const
-            elizaUrl = 'https://hokkoriaiv2.azurewebsites.net/reply',
-            data = {message: messageText},
-            config = {
-              headers: {
-                'Content-Type': 'application/json'
-              },
-            }
-          const elizaRes = await axios.post(elizaUrl, data);          
-          // const
-          //   elisaUrl = 'https://hokkoriai-eliza.azurewebsites.net/api/ReplyFucntion?code=81tSvorEPP46V0W5FTD/bGWUvMUm1g0jLfv8UNnWazthulzrW36MgA==',
-          //   data = {message: messageText}
-          // const elizaRes = await axios.post(elisaUrl, data);
+          this.eliza = new Eliza(this.context)
+          const elizaRes = await this.eliza.GetAnswer(messageText)
           this.context.log(elizaRes.data);
-          reply.push(util.generateTextMessage(elizaRes.data)); 
+          reply.push(util.generateTextMessage(elizaRes.data));
           await this.dbLog.addItem({ 'id': lineEvent.message.id, 'body': lineEvent, 'answer': '', 'feedback': 'bad' })
         }
         await this.client.replyMessage(replyToken, reply)

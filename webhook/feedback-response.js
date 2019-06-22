@@ -27,7 +27,7 @@ class FeedbackResponse {
       reply.push(util.generateTextMessage('既にフィードバックが登録済みです。'))
     }
 
-    reply.push(util.generateTextMessage('子育てに関して、知りたいことやお子さんの鳴き声を入力してください。'))
+    reply.push(util.generateTextMessage('子育てに関して、知りたいことやお子さんの泣き声を入力してください。'))
     return await this.client.replyMessage(replyToken, reply)
   }
 }

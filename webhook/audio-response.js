@@ -13,14 +13,15 @@ class AudioResponse {
   async replyMessage(replyToken, message) {
     if (this.isDebug == 'false') {
       const downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a'),
-        url = 'https://hokkoriaiv2.azurewebsites.net/api/audio?code=IVrbgLW1rSBVynREaNF0dc2X4O391/FobzDzAbJgA0kq6rm5nP/WvQ=='
+        // url = 'https://hokkoriaiv2.azurewebsites.net/api/audio?code=IVrbgLW1rSBVynREaNF0dc2X4O391/FobzDzAbJgA0kq6rm5nP/WvQ=='
+        url = 'https://hksample2.azurewebsites.net/api/audio'
       try {
         await this.downloadAudio(message.id, downloadPath)
         this.context.log('AudioResponse: file saved, send messages to 3rd server')
         var formData = {
           file: fs.createReadStream(downloadPath),
         };
-        
+
         const res = await request({ url: `${url}`, formData: formData })
         this.context.log(res)
         const replyText = {

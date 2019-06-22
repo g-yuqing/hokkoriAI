@@ -72,6 +72,8 @@ typings/
 # Serverless directories
 .serverless
 
-local.settings.json
+*local.settings.json
 
 *.DS_Store
+
+*.vscode

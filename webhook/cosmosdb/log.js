@@ -1,6 +1,5 @@
 'use strict'
 const CosmosClient = require("@azure/cosmos").CosmosClient;
-
 const config = require('./config')
 
 class CosmosDbLog {
@@ -17,6 +16,8 @@ class CosmosDbLog {
     try {
       const { dbResponse } = await this._cosmosClient.databases.createIfNotExists({ id: this._databaseId });
       this._database = dbResponse
+      this.context.log(config.endpoint)
+      this.context.log(config.cosmosDbKey)
       const { container } = await this._cosmosClient.database(this._databaseId).containers.createIfNotExists({ id: this._collectionId })
       this._container = container
     } catch (err) {
@@ -26,8 +27,43 @@ class CosmosDbLog {
   }
 
   async addItem(item) {
-    const { body: doc } = await this._container.items.create(item)
+    const { body: doc } = await this._container.items.upsert(item)
     return doc
+  }
+
+  async upsertUserLog(log) {
+    const {body: doc} = await this._container.items.upsert(log)
+    return doc
+  }
+
+  async updateUserLog(log) {
+    const {body: doc} = await this._container.items.up
+  }
+
+  async findUserLogByIdIn30Min(id) {
+    const findTimeStampUntil = Date.now() - 1800; // 30分前から取得
+
+    try {
+      const querySpec = {
+        query: "SELECT * FROM root r WHERE r.userId=@id and r.updateAt>@findTimeStampUntil",
+        parameters: [
+          {
+            name: "@id",
+            value: id
+          },
+          {
+            name: "@findTimeStampUntil",
+            value: findTimeStampUntil
+          }
+        ]
+      }
+
+      const { result: results } = await this._container.items.query(querySpec).toArray()
+      return results
+    } catch (err) {
+      this.context.log('Find item from database was failed with the error below')
+      this.context.log(err)
+    }
   }
 
   async findById(id) {

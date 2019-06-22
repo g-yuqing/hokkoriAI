@@ -3,6 +3,7 @@ const TextResponse = require('./text-response')
 const AudioResponse = require('./audio-response')
 const FileResponse = require('./file-response')
 const FeedbackResponse = require('./feedback-response')
+const MessageTextResponse = require('./MessageTextResponse')
 const Util = require('./Util')
 const util = new Util()
 
@@ -35,7 +36,7 @@ module.exports = async function (context, req) {
   async function handleEvent(event) {
     if (event.type === 'message') {
       if (event.message.type === 'text') {
-        const textRes = new TextResponse(client, context, false)
+        const textRes = new MessageTextResponse(client, context, false)
         await textRes.init()
         await textRes.replyMessage(event)
         return
@@ -58,7 +59,7 @@ module.exports = async function (context, req) {
       await feedRes.replyMessage(event)
       return
     }
-    var reply = util.generateTextMessage('子育てに関して、知りたいことやお子さんの鳴き声を入力してください。')
+    var reply = util.generateTextMessage('子育てに関して、知りたいことやお子さんの泣き声を入力してください。')
     await client.replyMessage(event.replyToken, reply)
     return
   }

@@ -27,22 +27,24 @@ const index: AzureFunction = async function (context: Context, req: HttpRequest)
     context.done();
   }
 
-  async function handleEvent(event: LineTypes.WebhookEvent): Promise<void> {
+  type RequiredEvent = LineTypes.MessageEvent | LineTypes.PostbackEvent; // LineTypes.WebhookEventではtypeへアクセスできないので。
+  async function handleEvent(event: RequiredEvent): Promise<void> {
+    if (!event.hasOwnProperty("type")) { return; }
     if (event.type === "message") {
       var messageEvent = event as LineTypes.MessageEvent;
       if (messageEvent.message.type === 'text') {
         const messageRes = new MessageTextResponse(client, context);
         await messageRes.init();
-        return await messageRes.replyMessage(event);
+        return await messageRes.replyMessage(messageEvent);
       } else if (messageEvent.message.type === "audio") {
-        var audioEvent = event.message as LineTypes.AudioEventMessage;
+        var audioEvent = messageEvent.message as LineTypes.AudioEventMessage;
         const audioRes = new AudioResponse(client, context);
-        return await audioRes.replyMessage(event.replyToken, audioEvent);
+        return await audioRes.replyMessage(messageEvent.replyToken, audioEvent);
         //TODO save audio to blob storage
       } else if (messageEvent.message.type === "file") {
-        var fileEvent = event.message as LineTypes.FileEventMessage;
+        var fileEvent = messageEvent.message as LineTypes.FileEventMessage;
         const fileRes = new FileResponse(client, context);
-        return await fileRes.replyMessage(event.replyToken, fileEvent);
+        return await fileRes.replyMessage(messageEvent.replyToken, fileEvent);
       }
     } else if (event.type = "postback") {
       var postbackEvent = event as LineTypes.PostbackEvent;

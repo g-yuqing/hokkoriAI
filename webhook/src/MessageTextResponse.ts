@@ -52,10 +52,9 @@ class MessageTextResponse {
                 logState.answers.push(qnaFirstRes!.answers[0].answer);
                 logState.updateAt = Date.now();
                 this.dbLog.upsertUserLog(logState);
-
-                const qnaChoice = this.qnaMaker.GenerateSelection(qnaFirstRes!.answers[0]);
-                reply.push(qnaChoice);
-                return await this.client.replyMessage(replyToken, qnaChoice);
+                reply.push(Util.generateTextMessage(qnaFirstRes!.answers[0].answer));
+                reply.push(Util.generateFeedBackForm());
+                return await this.client.replyMessage(replyToken, reply);
             } else {
                 //QnA Maker で回答できなかった
                 this.context.log("QnAMaker回答失敗");
@@ -68,6 +67,7 @@ class MessageTextResponse {
                     logState.answers.push(elizaRes);
                     logState.updateAt = Date.now();
                     this.dbLog.upsertUserLog(logState);
+                    this.context.log(reply);
                     return await this.client.replyMessage(replyToken, reply);
                 } else {
                     // 2度目のメッセージなので、窓口案内
@@ -77,6 +77,7 @@ class MessageTextResponse {
                     logState.feedback = 'CannotAnswer';
                     logState.updateAt = Date.now();
                     this.dbLog.upsertUserLog(logState);
+                    this.context.log(reply);
                     return await this.client.replyMessage(replyToken, reply);
                 }
             }

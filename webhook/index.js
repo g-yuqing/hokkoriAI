@@ -33,23 +33,26 @@ const index = async function (context, req) {
         context.done();
     }
     async function handleEvent(event) {
+        if (!event.hasOwnProperty("type")) {
+            return;
+        }
         if (event.type === "message") {
             var messageEvent = event;
             if (messageEvent.message.type === 'text') {
                 const messageRes = new MessageTextResponse_1.MessageTextResponse(client, context);
                 await messageRes.init();
-                return await messageRes.replyMessage(event);
+                return await messageRes.replyMessage(messageEvent);
             }
             else if (messageEvent.message.type === "audio") {
-                var audioEvent = event.message;
+                var audioEvent = messageEvent.message;
                 const audioRes = new audio_response_1.AudioResponse(client, context);
-                return await audioRes.replyMessage(event.replyToken, audioEvent);
+                return await audioRes.replyMessage(messageEvent.replyToken, audioEvent);
                 //TODO save audio to blob storage
             }
             else if (messageEvent.message.type === "file") {
-                var fileEvent = event.message;
+                var fileEvent = messageEvent.message;
                 const fileRes = new file_response_1.FileResponse(client, context);
-                return await fileRes.replyMessage(event.replyToken, fileEvent);
+                return await fileRes.replyMessage(messageEvent.replyToken, fileEvent);
             }
         }
         else if (event.type = "postback") {

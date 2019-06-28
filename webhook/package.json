@@ -18,6 +18,7 @@
   "homepage": "https://github.com/kheiakiyama/line-movie-reaction-bot#readme",
   "dependencies": {
     "@azure/cosmos": "^2.0.2",
+    "@azure/functions": "^1.0.3",
     "@line/bot-sdk": "^6.7.1",
     "async": "^2.6.1",
     "axios": "^0.19.0",
@@ -27,9 +28,12 @@
     "get-audio-duration": "0.0.1",
     "request": "^2.87.0",
     "request-promise": "^4.2.4",
+    "typescript": "^3.5.2",
     "yargs": "^12.0.1"
   },
   "devDependencies": {
+    "@types/node": "^12.0.10",
+    "@types/request-promise": "^4.1.44",
     "eslint": "^5.16.0"
   }
 }

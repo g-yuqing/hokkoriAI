@@ -1,14 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+import * as LineTypes from "@line/bot-sdk/lib/types";
+import {FeedbackData} from "./Types/types";
+
 class Util {
-    static generateTextMessage(message) {
-        var reply = { type: 'text', text: message };
+    public static generateTextMessage(message: string): LineTypes.TextMessage {
+        var reply: LineTypes.TextMessage = { type: 'text', text: message }
         return reply;
     }
-    static generateFeedBackForm() {
-        var feedbackDataTrue = { kind: "feedback", result: true };
-        var feedbackDataFalse = { kind: "feedback", result: false };
-        var actions = [
+
+    public static generateFeedBackForm(): LineTypes.TemplateMessage {
+        var feedbackDataTrue: FeedbackData = { kind: "feedback", result: true };
+        var feedbackDataFalse: FeedbackData = { kind: "feedback", result: false };
+        var actions: LineTypes.Action[] = [
             {
                 type: "postback",
                 label: "はい",
@@ -22,18 +24,22 @@ class Util {
                 displayText: "いいえ"
             }
         ];
-        var resTemplate = {
+
+        var resTemplate: LineTypes.TemplateButtons = {
             type: "buttons",
             title: "フィードバックお願いします",
             text: "この回答は役に立ちましたか？",
             actions: actions
         };
-        var res = {
+
+        var res: LineTypes.TemplateMessage = {
             type: "template",
             altText: "フィードバックお願いします",
             template: resTemplate
         };
+
         return res;
     }
 }
-exports.Util = Util;
+
+export { Util };

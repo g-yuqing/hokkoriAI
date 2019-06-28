@@ -1,5 +1,5 @@
 const axios = require('axios')
-const Util = require('./Util')
+const Util = require('./_Util')
 const util = new Util()
 const CosmosDbLog = require('./cosmosdb/log')
 const QnaMaker = require('./qnamaker/QnaMaker')

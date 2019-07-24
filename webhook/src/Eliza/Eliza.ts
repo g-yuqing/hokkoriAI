@@ -9,7 +9,7 @@ class Eliza {
     }
 
     async GetAnswer(text: string): Promise<string> {
-        const elizaUrl = 'https://hokkoriaiv2.azurewebsites.net/reply'
+        const elizaUrl = process.env.ElizaURL!
         const data = { message: text }
         const config: AxiosRequestConfig = {
             headers: {

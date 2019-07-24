@@ -8,6 +8,7 @@ import { QnaMaker } from "./qnaMaker/QnaMaker";
 import { Util } from "./Util";
 import { GeneralReply } from "./GeneralReply/GeneralReply";
 import * as PostBackData from "./Types/types";
+import { MidwifeInfoDatabase } from "./MidwifeInfo/MidwifeInfoDatabase";
 
 class PostbackEvent {
     client: Line.Client;
@@ -56,7 +57,13 @@ class PostbackEvent {
                     this.dbLog.upsertUserLog(logState);
                 } else {
                     // 回答不満足。解決できなかったので、窓口案内
-                    const announce = GeneralReply.GetUnsatisfiedMessage();
+                    var announce = GeneralReply.GetUnsatisfiedMessage();
+
+                    var midwifeList = await new MidwifeInfoDatabase(this.context).GetMidwifeInfoAsync();
+                    if (midwifeList.length > 0) {
+                        announce = GeneralReply.GetUnsatisfiedMessage(midwifeList[0].GenerateAnnouncementString());
+                    }
+
                     reply.push(Util.generateTextMessage(announce));
                     logState.feedback = 'NotSatisfied';
                     logState.updateAt = Date.now();
@@ -71,7 +78,11 @@ class PostbackEvent {
                     reply.push(Util.generateFeedBackForm());
                 } else {
                     // 解決できなかったので、窓口案内
-                    const announce = GeneralReply.GetFailureReply();
+                    var announce = GeneralReply.GetFailureReply();
+                    var midwifeList = await new MidwifeInfoDatabase(this.context).GetMidwifeInfoAsync();
+                    if (midwifeList.length > 0) {
+                        announce = GeneralReply.GetFailureReply(midwifeList[0].GenerateAnnouncementString());
+                    }
                     reply.push(Util.generateTextMessage(announce));
                     logState.feedback = 'CannotAnswer';
                     logState.updateAt = Date.now();

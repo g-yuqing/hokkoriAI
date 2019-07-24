@@ -7,6 +7,7 @@ import { UserLog } from "./cosmosdb/UserLog";
 import { QnaMaker } from "./qnaMaker/QnaMaker";
 import { Util } from "./Util";
 import { GeneralReply } from "./GeneralReply/GeneralReply";
+import { MidwifeInfoDatabase } from "./MidwifeInfo/MidwifeInfoDatabase";
 
 class MessageTextResponse {
     client: Line.Client;
@@ -70,9 +71,14 @@ class MessageTextResponse {
                     this.context.log(reply);
                     return await this.client.replyMessage(replyToken, reply);
                 } else {
-                    // 2度目のメッセージなので、窓口案内
+                    // 2度目のメッセージなので、助産師さん紹介
                     this.context.log("窓口回答");
-                    const announce = GeneralReply.GetFailureReply();
+                    var announce = GeneralReply.GetFailureReply();
+                    var midwifeList = await new MidwifeInfoDatabase(this.context).GetMidwifeInfoAsync();
+                    if (midwifeList.length > 0) {
+                        announce = GeneralReply.GetFailureReply(midwifeList[0].GenerateAnnouncementString());
+                    }
+
                     reply.push(Util.generateTextMessage(announce));
                     logState.feedback = 'CannotAnswer';
                     logState.updateAt = Date.now();

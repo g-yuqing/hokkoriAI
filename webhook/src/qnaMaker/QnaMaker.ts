@@ -11,12 +11,12 @@ class QnaMaker {
     }
 
     async GetQnaAnswer(text: string): Promise<QnaResponse | null> {
-        const url = 'https://hokkoriai-qna.azurewebsites.net/qnamaker/knowledgebases/7a05a644-aacc-4177-b3af-73f3d249fe8f/generateAnswer';
+        const url = process.env.QnAURL!;
         const data = { question: `${text}`, top: 1, scoreThreshold: 40 };
         const config: AxiosRequestConfig = {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'EndpointKey 0c088b78-4811-4565-b452-d121ae9075b1'
+                'Authorization': process.env.QnAAuthKey!
             },
         }
         try {

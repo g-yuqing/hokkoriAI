@@ -20,7 +20,7 @@ class FileResponse {
         const ext = path.extname(message.fileName)
         if (ext === '.m4a' || ext === '.wav' || ext === '.mp3') {
             const downloadPath = path.join(__dirname, 'tempfile', 'audio.m4a'),
-            url = 'https://hokkoriaiv2.azurewebsites.net/api/audio?code=IVrbgLW1rSBVynREaNF0dc2X4O391/FobzDzAbJgA0kq6rm5nP/WvQ=='
+            url = process.env.AudioURL!
             try {
                 await this.downloadAudio(message.id, downloadPath)
                 this.context.log('AudioResponse: file saved, send messages to 3rd server')

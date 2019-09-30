@@ -69,6 +69,43 @@ class MidwifeInfoDatabase {
             }
         })
     }
+
+    async GetMidwifeInfoWithSupportTimeAsync(requestTime: number) {
+        return new Promise((resolve: (value: MidwifeInfo[]) => void, reject) => {
+            try {
+                var connection = new Connection(this.config);
+                connection.on('connect', function (err) {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        // Read all rows from table
+                        var request = new Request(
+                            `SELECT * from midwife_info where ${requestTime} >= support_time_start and support_time_end >= ${requestTime}`,
+                            function (err, rowCount, rows) {
+                                if (err != null) {
+                                    reject(err);
+                                }
+                                const infos = Array<MidwifeInfo>();
+                                rows.forEach(function (columns) {
+                                    var rowObject: { [key: string]: any; } = {};
+                                    columns.forEach(function (column: any) {
+                                        rowObject[column.metadata.colName] = column.value;
+                                    });
+                                    infos.push(new MidwifeInfo(rowObject))
+                                });
+
+                                resolve(infos);
+                            }
+                        );
+                        connection.execSql(request);
+                    }
+                });
+            } catch {
+                reject();
+            }
+        })
+    }
 }
 
 export { MidwifeInfoDatabase, MidwifeInfoDatabaseConfig };

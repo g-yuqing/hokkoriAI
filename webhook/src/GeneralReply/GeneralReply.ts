@@ -1,6 +1,6 @@
 class GeneralReply {
-    static GetFailureReply(announceComment: string = this.GetFacilityURL()): string {
-        const message = "ごめんね。今はまだ分からないの。\n よかったら、ここに相談してみて。\n"  + announceComment;
+    static GetFailureReply(): string {
+        const message = "ごめんね。今はまだ分からないことが多いの。もっと勉強するね。";
         return message;
     }
 
@@ -20,8 +20,13 @@ class GeneralReply {
         return comment;
     }
 
-    static GetUnsatisfiedMessage(announceComment: string = this.GetFacilityURL()): string {
-        const comment = "お役に立てなくてごめんなさい。\n  よかったら、ここに相談してみて。\n" + announceComment;
+    static GetUnsatisfiedMessage(): string {
+        const comment = "お役に立てなくてごめんなさい。";
+        return comment;
+    }
+
+    static GetPleaseAskAgain(): string {
+        const comment = "よかったら、また話しかけてね。";
         return comment;
     }
 

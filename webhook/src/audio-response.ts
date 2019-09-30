@@ -64,7 +64,6 @@ class AudioResponse {
                 stream.on('error', reject)
             }))
     }
-
 }
 
 interface ReplyInterface {

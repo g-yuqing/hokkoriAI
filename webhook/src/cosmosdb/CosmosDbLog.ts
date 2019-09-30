@@ -54,7 +54,7 @@ class CosmosDbLog {
     async findUserLogByIdIn30Min(id: string): Promise<Array<UserLog>> {
         try {
             const findTimeStampUntil: number = Date.now() - 1800000; // 30分前から取得
-            const cosmosQuery = `SELECT * FROM root r WHERE r.userId = "${id}" and r.updateAt > ${findTimeStampUntil} and r.feedback="none"`;
+            const cosmosQuery = `SELECT * FROM root r WHERE r.userId = "${id}" and r.updateAt > ${findTimeStampUntil} and r.state!="none"`;
             const { result: response } = await this.container!.items.query(cosmosQuery).toArray()
             return response as UserLog[];
         } catch (err) {

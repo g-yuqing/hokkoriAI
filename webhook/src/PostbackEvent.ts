@@ -7,7 +7,7 @@ import { UserLog } from "./cosmosdb/UserLog";
 import { QnaMaker } from "./qnaMaker/QnaMaker";
 import { Util } from "./Util";
 import { GeneralReply } from "./GeneralReply/GeneralReply";
-import * as PostBackData from "./Types/types";
+import { PostBackData, MidwifeRequestInfoData, FeedbackData, AskMidwifeData } from "./Types/types";
 import { MidwifeInfoDatabase } from "./MidwifeInfo/MidwifeInfoDatabase";
 
 class PostbackEvent {
@@ -34,10 +34,11 @@ class PostbackEvent {
         var postback = postbackEvent.postback as LineTypes.Postback;
         var userId = postbackEvent.source.userId!;
         try {
-            var reply = [];
             var logState: UserLog;
             var logStates = await this.dbLog.findUserLogByIdIn30Min(userId);
-            if (logStates == undefined || logStates.length == 0 || logStates[0].feedback != "none") {
+            var reply: LineTypes.Message[] = [];
+
+            if (logStates == undefined || logStates.length == 0) {
                 // 忘れてしまったアナウンスしておわり
                 const announce = GeneralReply.GetRequestAgain();
                 reply.push(Util.generateTextMessage(announce));
@@ -46,50 +47,39 @@ class PostbackEvent {
                 logState = logStates[0];
             }
 
-            let feedbackData: PostBackData.PostBackData = JSON.parse(postback.data);
-            if (feedbackData.kind === "feedback") {
+            let postbackData: PostBackData = JSON.parse(postback.data);
+            if (postbackData.kind === 'midwiferequestfino') {
+                let midwifeInfo = postbackData as MidwifeRequestInfoData;
+                reply.push(Util.generateTextMessage(`${midwifeInfo.midwife_name}さんのLINE IDは"${midwifeInfo.lineid}"です。\nよかったら友達申請してみてくださいね。`));
+                logState.state = 'none';
+
+            } else if (postbackData.kind === "askmidwife") {
+                let askMidWife = postbackData as AskMidwifeData;
+                if (askMidWife.result) {
+                    logState.state = "RequestSupport";
+                    reply.push(Util.generateTextMessage("子育てサポータを探してみるね。\nご希望の日付と時間を入力してくださいね。"));
+                } else {
+                    logState.state = "none";
+                    reply.push(Util.generateTextMessage(GeneralReply.GetPleaseAskAgain()));
+                }
+
+            } else if (postbackData.kind === "feedback") {
+                let feedbackData = postbackData as FeedbackData;
                 if (feedbackData.result) {
                     // 回答満足
                     const announce = GeneralReply.GetEndGreeting();
                     reply.push(Util.generateTextMessage(announce));
                     logState.feedback = 'Satisfied';
-                    logState.updateAt = Date.now();
-                    this.dbLog.upsertUserLog(logState);
+                    logState.state = "none"
                 } else {
                     // 回答不満足。解決できなかったので、窓口案内
-                    var announce = GeneralReply.GetUnsatisfiedMessage();
-
-                    var midwifeList = await new MidwifeInfoDatabase(this.context).GetMidwifeInfoAsync();
-                    if (midwifeList.length > 0) {
-                        announce = GeneralReply.GetUnsatisfiedMessage(midwifeList[0].GenerateAnnouncementString());
-                    }
-
-                    reply.push(Util.generateTextMessage(announce));
+                    reply.push(Util.generateTextMessage(GeneralReply.GetUnsatisfiedMessage()));
+                    reply.push(Util.generateAskMidwifeForm());
                     logState.feedback = 'NotSatisfied';
-                    logState.updateAt = Date.now();
-                    this.dbLog.upsertUserLog(logState);
-                }
-
-            } else if (feedbackData.kind === "qaconfirm") {
-                if (feedbackData.result) {
-                    // 回答要求
-                    reply.push(Util.generateTextMessage(logState.answers[logState.answers.length - 1]));
-                    // Send Feedback Request
-                    reply.push(Util.generateFeedBackForm());
-                } else {
-                    // 解決できなかったので、窓口案内
-                    var announce = GeneralReply.GetFailureReply();
-                    var midwifeList = await new MidwifeInfoDatabase(this.context).GetMidwifeInfoAsync();
-                    if (midwifeList.length > 0) {
-                        announce = GeneralReply.GetFailureReply(midwifeList[0].GenerateAnnouncementString());
-                    }
-                    reply.push(Util.generateTextMessage(announce));
-                    logState.feedback = 'CannotAnswer';
-                    logState.updateAt = Date.now();
-                    this.dbLog.upsertUserLog(logState);
                 }
             }
-
+            logState.updateAt = Date.now();
+            this.dbLog.upsertUserLog(logState);
             return await this.client.replyMessage(replyToken, reply);
         } catch (err) {
             this.context.log("[PostbackEvent] somthing happen.");

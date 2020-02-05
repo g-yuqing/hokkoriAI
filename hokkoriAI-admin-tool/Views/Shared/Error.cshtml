@@ -1,0 +1,12 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1>@Model.ErrorCode</h1>
+<h2>@Model.ErrorMessage</h2>
+
+<div>
+    5秒後にトップへ戻ります。戻らない場合は<a href=@Model.RedirectUri>こちら</a>をクリックしてください。
+</div>
+<meta http-equiv="refresh" content="5;URL=@Model.RedirectUri">
